@@ -1,4 +1,4 @@
-// Builds every episode (course + Instagram week + 16:9 trailer), one after another.
+// Builds every episode (course + Instagram weeks + 16:9 trailer + Genre Pack lessons), one after another.
 //
 //   node videos/build-all.mjs            all episodes
 //   node videos/build-all.mjs ads        only files whose path contains "ads"
@@ -16,7 +16,7 @@ const args = process.argv.slice(2);
 const filter = args.find((a) => !a.startsWith("--"));
 const skipExisting = args.includes("--skip-existing");
 
-const files = ["course", "ads"].flatMap((dir) =>
+const files = ["course", "ads", "packs"].flatMap((dir) =>
   readdirSync(join(HERE, "episodes", dir)).filter((f) => f.endsWith(".mjs")).sort().map((f) => join(HERE, "episodes", dir, f)));
 
 for (const file of files) {

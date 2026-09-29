@@ -1,19 +1,29 @@
 # PIXEL KIT: ako to celé spustiť (krok za krokom)
 
-Tento návod ťa prevedie od stiahnutia až po prvú predaj. Predpokladá, že nič z toho si ešte nerobil.
+Tento návod ťa prevedie od nuly až po prvý predaj. Predpokladá, že nič z toho si ešte nerobil. Na konci bude všetko automatické: **človek zadá e-mail → do minúty mu príde lekcia zadarmo**, **človek zaplatí → hneď mu prídu súbory na stiahnutie**, bez toho, aby si čokoľvek robil ručne.
 
-## Čo je hotové v repozitári
+## Ako to celé funguje
 
-| Priečinok / súbor | Čo to je |
+| Čo spraví zákazník | Čo sa stane automaticky | Kto to robí |
+|---|---|---|
+| Na webe zadá e-mail | Do minúty mu príde e-mail s lekciou zadarmo (PDF + video), potom 5 ďalších e-mailov počas 9 dní, ktoré predávajú kurz | Netlify funkcia `subscribe` → **MailerLite** |
+| Klikne „Get the course“ a zaplatí | Hneď mu príde potvrdenie s odkazmi na stiahnutie ZIP-ov (PDF + videá) | **Lemon Squeezy** |
+| (po zaplatení) | Príde mu uvítací e-mail „Start here“ a prestanú mu chodiť predajné e-maily | Netlify funkcia `lemon-webhook` → MailerLite |
+
+Kupujúci dostanú len prehľadné **PDF a MP4 videá v ZIP-e**, nič z GitHubu.
+
+## Čo je hotové
+
+| Súbor / priečinok | Čo to je |
 |---|---|
-| `site/` | Web: landing page, `thanks.html` (po zaplatení), `privacy.html`, lekcia zadarmo v `site/free/`, trailer v `site/media/` |
-| `course/modules/` | Celý kurz v textovej podobe (9 modulov, 43 lekcií) |
-| `course/pdf/` | PDF: 9 modulov, lekcia zadarmo, celý kurz v jednom PDF a 3 bonusy |
-| `videos/out/` | Všetky hotové videá s komentátorom (kurz + reklamy) |
-| `social/` | Instagram: plán na týždeň, popisky, hashtagy, karusely |
-| `assets/brand/` | Logo, profilovka na Instagram, logo pre Roblox intro |
-| `index.ts`, `scripts/hf-generate.ts` | Higgsfield (Seedance 2.5): test a generovanie AI klipov |
-| `PLAN.md` | Obchodný plán (ceny, marketing, čísla) |
+| `site/` | Web: landing page, `thanks.html` (po zaplatení), `privacy.html`, lekcia zadarmo v `site/free/` |
+| `netlify/functions/` | Automatické e-maily: prihlásenie na lekciu zadarmo a webhook z Lemon Squeezy |
+| `email/SEQUENCE.md` | Texty všetkých 7 e-mailov, pripravené na skopírovanie do MailerLite |
+| `course/pdf/` | PDF: 9 modulov, lekcia zadarmo, celý kurz, 4 bonusy, **Horror Pack** a **Tycoon Pack** |
+| `videos/out/` | Všetky videá s komentátorom (kurz, 2 packy, reklamy na 2 týždne) |
+| `dist/` | Hotové ZIP-y na predaj (vzniknú po `npm run release`, pozri 3.1) |
+| `social/` | Instagram + TikTok + YouTube Shorts: plán na 2 týždne, popisky, hashtagy, karusely |
+| `docs/PIXEL-KIT-Navod.pdf` | Tento návod ako PDF |
 
 ---
 
@@ -21,61 +31,122 @@ Tento návod ťa prevedie od stiahnutia až po prvú predaj. Predpokladá, že n
 
 1. Choď na **app.netlify.com** a prihlás sa cez GitHub.
 2. **Add new site → Import an existing project → GitHub →** vyber repozitár **pixelkit**.
-3. Build command nechaj **prázdny**. Súbor `netlify.toml` sám nastaví, že sa zverejní len priečinok `site/`.
+3. Build command nechaj **prázdny**. Súbor `netlify.toml` sám nastaví web (`site/`) aj e-mailové funkcie (`netlify/functions/`).
 4. Klikni **Deploy**. O minútu máš adresu typu `nieco.netlify.app`.
-5. (Voliteľné) **Domain settings → Add a custom domain**, ak si kúpiš doménu (napr. `pixelkit.gg`).
+5. (Voliteľné, odporúčam) **Domain settings → Add a custom domain**, ak si kúpiš doménu (napr. `pixelkit.gg`, ~10–15 € ročne).
+
+> **Dôležité:** web musí byť prepojený s GitHubom (tento postup). Keby si priečinok `site/` len pretiahol do Netlify (drag & drop), e-mailové funkcie by nefungovali.
 
 Odteraz sa web aktualizuje sám pri každej zmene na GitHube.
 
-## 2. Zbieranie e-mailov (10 minút, zadarmo)
+## 2. Automatické e-maily (30 minút, zadarmo)
 
-1. Založ si účet na **formspree.io** a vytvor nový formulár.
-2. Skopíruj jeho adresu (napr. `https://formspree.io/f/abcdwxyz`).
-3. Na GitHube otvor `site/index.html`, klikni na ceruzku (Edit) a nájdi blok `CONFIG` úplne dole.
-4. Vlož adresu do `FORM_ENDPOINT: "https://formspree.io/f/abcdwxyz",` a ulož (Commit changes).
-5. Otvor web, zapíš sa vlastným e-mailom. Hneď uvidíš odkazy na lekciu zadarmo (PDF + video) a e-mail sa objaví vo Formspree.
+Používame **MailerLite**: zadarmo do 1 000 odberateľov a vie posielať automatické série e-mailov.
 
-## 3. Platobná brána (30 minút)
+**2.1 Účet a skupiny**
+1. Registrácia na **mailerlite.com** (vyber bezplatný plán). Over svoju doménu alebo e-mail odosielateľa podľa ich návodu. Ak máš vlastnú doménu, over ju (DKIM/SPF), e-maily potom nepadajú do spamu.
+2. **Subscribers → Groups → Create group**, vytvor dve skupiny: `Free lesson` a `Customers`.
+3. Pri každej skupine si zapíš jej **ID** (číslo v adrese URL, keď skupinu otvoríš, alebo v detailoch skupiny).
 
-Odporúčam **Lemon Squeezy**: rieši platby kartou, PayPal aj Apple Pay, **sám odvádza DPH v EÚ** a po zaplatení sám pošle zákazníkovi súbory na stiahnutie.
+**2.2 API kľúč**
+1. **Integrations → MailerLite API → Use → Generate new token**. Pomenuj ho `netlify`.
+2. Kľúč skopíruj a **nikam ho neposielaj** (ani do chatu, ani na GitHub). Patrí len do Netlify.
 
-**3.1 Priprav balík kurzu** (na počítači, pozri časť 7.1 ako rozbehnúť projekt):
+**2.3 Premenné v Netlify**
+
+V Netlify: **Site configuration → Environment variables → Add a variable** a pridaj:
+
+| Názov | Hodnota |
+|---|---|
+| `MAILERLITE_API_KEY` | API kľúč z 2.2 |
+| `MAILERLITE_GROUP_FREE` | ID skupiny `Free lesson` |
+| `MAILERLITE_GROUP_CUSTOMERS` | ID skupiny `Customers` |
+| `LEMON_WEBHOOK_SECRET` | vymyslené dlhé heslo, napr. 30 náhodných znakov (použiješ ho aj v 3.4) |
+
+Potom **Deploys → Trigger deploy → Deploy site**, aby sa premenné načítali.
+
+**2.4 Automatizácie (tu sa posielajú e-maily)**
+1. **Automations → Create workflow → Start from scratch**, názov `Free lesson`.
+2. Trigger: **When subscriber joins a group → Free lesson**.
+3. Pridaj **Email** a vlož text **Email 1** z `email/SEQUENCE.md` (predmet, text, odkazy). `https://YOUR-SITE` nahraď adresou tvojho webu.
+4. Pridaj **Delay 1 day → Email 2**, potom **Delay 2 days → Email 3**, a tak ďalej až po Email 6 (presné poradie je v tabuľke v `email/SEQUENCE.md`).
+5. Pred Email 3 vlož **Condition: Group membership → is in Customers**. Vetvu „Yes“ nechaj prázdnu (automatizácia končí), vetvu „No“ pokračuj e-mailami. Tak kupujúcim prestanú chodiť predajné e-maily.
+6. Zapni workflow (**Activate**).
+7. Druhý workflow `Customers`: trigger **joins group → Customers**, jeden e-mail **C1**. Doplň odkaz na Discord. Aktivuj.
+
+**2.5 Test**
+1. Otvor web, zadaj svoj e-mail, zaškrtni súhlas a klikni **Send me the lesson**.
+2. Na webe uvidíš „Check your inbox!“. Do minúty ti príde Email 1 s lekciou zadarmo.
+3. Keby nie: v Netlify pozri **Logs → Functions → subscribe**. Chyba tam presne napíše, čo chýba (napr. nesprávne ID skupiny).
+
+> Plán B bez MailerLite: v Lemon Squeezy vytvor produkt „Free lesson“ za **$0** a nahraj k nemu PDF a video. Lemon Squeezy si vypýta e-mail a súbory pošle sám. Chýba ti ale séria predajných e-mailov, preto odporúčam MailerLite.
+
+## 3. Platobná brána a automatické doručenie súborov (40 minút)
+
+Odporúčam **Lemon Squeezy**: rieši platby kartou, PayPal aj Apple Pay, **sám odvádza DPH v EÚ** a hneď po zaplatení **sám pošle zákazníkovi e-mail s odkazmi na stiahnutie**.
+
+**3.1 ZIP-y na predaj**
+
+Hotové ZIP-y som ti poslal priamo do chatu. Ak ich chceš vytvoriť znova (po úprave kurzu), na počítači spusti (pozri 7.1):
 ```bash
+npm run build:pdf
 npm run release
 ```
-Vznikne `dist/PIXEL-KIT-Core-Course.zip` (všetky PDF + videá + návod „START HERE“).
+V priečinku `dist/` vzniknú:
 
-**3.2 Nastav obchod:**
+| Súbor | Obsah |
+|---|---|
+| `PIXEL-KIT-Core-Course.zip` | 15 PDF (moduly, lekcia zadarmo, celý kurz, 4 bonusy) + 10 videí + START HERE |
+| `PIXEL-KIT-Horror-Pack.zip` | Horror Pack PDF + 5 videí + START HERE |
+| `PIXEL-KIT-Tycoon-Pack.zip` | Tycoon Pack PDF + 5 videí + START HERE |
+
+**3.2 Obchod a produkty**
 1. Registrácia na **lemonsqueezy.com**, vytvor obchod (Store). Vyplň údaje na výplaty (Payouts) a over identitu.
-2. **Products → New product**, vytvor tri produkty:
+2. **Products → New product**. Pri každom produkte v časti **Files** nahraj ZIP-y podľa tabuľky (k jednému produktu môžeš nahrať viac súborov):
 
-| Produkt | Cena (early access) | Súbor |
-|---|---|---|
-| PIXEL KIT Core Course | $29 | `PIXEL-KIT-Core-Course.zip` |
-| PIXEL KIT Creator Bundle | $59 | ten istý ZIP (Genre Packy doplníš, keď budú hotové) |
-| PIXEL KIT All Access | $99 | ten istý ZIP |
+| Produkt | Cena | Súbory (Files) | Kľúč v `CHECKOUT` |
+|---|---|---|---|
+| PIXEL KIT Core Course | $29 | Core-Course.zip | `course` |
+| PIXEL KIT Creator Bundle | $59 | Core-Course.zip + Horror-Pack.zip + Tycoon-Pack.zip | `bundle` |
+| PIXEL KIT All Access | $99 | všetky tri ZIP-y | `all` |
+| Horror Pack | $19 | Horror-Pack.zip | `horror` |
+| Tycoon Pack | $19 | Tycoon-Pack.zip | `tycoon` |
 
-3. Pri každom produkte v časti **Confirmation modal / Redirect** nastav návratovú adresu na `https://TVOJ-WEB/thanks.html`.
+3. Pri každom produkte v **Confirmation modal / Redirect** nastav adresu `https://TVOJ-WEB/thanks.html`.
 4. Pri produkte klikni **Share** a skopíruj **Checkout link**.
-5. V `site/index.html` v bloku `CONFIG` vlož odkazy:
-   ```js
-   CHECKOUT: {
-     course: "https://tvoj-obchod.lemonsqueezy.com/buy/...",
-     bundle: "https://tvoj-obchod.lemonsqueezy.com/buy/...",
-     all: "https://tvoj-obchod.lemonsqueezy.com/buy/...",
-   },
-   ```
-   Web potom sám otvorí platobné okno priamo na stránke (overlay).
-6. **Otestuj:** v Lemon Squeezy zapni **Test mode**, kúp si kurz testovacou kartou `4242 4242 4242 4242`, over, že prišiel e-mail so ZIP-om a presmerovalo ťa na `thanks.html`. Potom test mode vypni.
 
-> Ak by bol ZIP na nahratie príliš veľký, nahraj videá na YouTube ako **Unlisted** (nezaradené) a do ZIP-u daj len PDF a súbor s odkazmi na videá.
+**3.3 Odkazy na web**
 
-**Alternatívy:** Gumroad (rovnako jednoduchý, tiež rieši DPH) alebo Stripe Payment Links (DPH si riešiš sám). Do `CHECKOUT` vložíš ich odkaz rovnakým spôsobom.
+V `site/index.html` úplne dole v bloku `CONFIG` vlož odkazy (na GitHube: otvor súbor → ceruzka → uprav → **Commit changes**):
+```js
+CHECKOUT: {
+  course: "https://tvoj-obchod.lemonsqueezy.com/buy/...",
+  bundle: "https://tvoj-obchod.lemonsqueezy.com/buy/...",
+  all: "https://tvoj-obchod.lemonsqueezy.com/buy/...",
+  horror: "https://tvoj-obchod.lemonsqueezy.com/buy/...",
+  tycoon: "https://tvoj-obchod.lemonsqueezy.com/buy/...",
+},
+```
+Web potom otvorí platobné okno priamo na stránke. Horror a Tycoon Pack sa na webe samé ukážu ako „Out now“ s tlačidlom na kúpu.
+
+**3.4 Webhook (kupujúci dostanú uvítací e-mail)**
+1. Lemon Squeezy: **Settings → Webhooks → +**.
+2. Callback URL: `https://TVOJ-WEB/api/lemon-webhook`
+3. Signing secret: **to isté heslo** ako `LEMON_WEBHOOK_SECRET` v Netlify (2.3).
+4. Udalosti (events): zaškrtni **order_created**. Ulož.
+
+**3.5 Test celého nákupu**
+1. V Lemon Squeezy zapni **Test mode**.
+2. Na webe kúp Core Course testovacou kartou `4242 4242 4242 4242` (ľubovoľný dátum v budúcnosti a CVC).
+3. Over: presmerovalo ťa na `thanks.html`, prišiel e-mail od Lemon Squeezy s odkazmi na stiahnutie, prišiel uvítací e-mail C1 a v MailerLite si v skupine `Customers`.
+4. Potom test mode vypni. Ak chceš prijímať skutočné platby, v Lemon Squeezy musíš mať schválený obchod (store activation).
+
+**Alternatívy:** Gumroad (tiež rieši DPH a posiela súbory) alebo Stripe Payment Links (DPH aj doručenie súborov si riešiš sám). Webhook `lemon-webhook` funguje len s Lemon Squeezy.
 
 ## 4. Doplň posledné údaje na webe
 
 - `site/thanks.html` → na konci súboru `DISCORD_INVITE` (odkaz na tvoj Discord server) a `SUPPORT_EMAIL`.
-- `site/privacy.html` → všetko v `[HRANATÝCH ZÁTVORKÁCH]` (meno, kontakt, dátum, poskytovatelia).
+- `site/privacy.html` → všetko v `[HRANATÝCH ZÁTVORKÁCH]` (meno, kontakt, dátum). MailerLite a Lemon Squeezy sú tam už doplnené.
 - Na webe sľubujeme **14-dňovú garanciu vrátenia peňazí**, a v balíku All Access **mesačný live Q&A** a **spätnú väzbu na hru**. Buď ich dodržuj, alebo ich z textu webu odstráň.
 
 ### 4.1 Prvky, ktoré predávajú (voliteľné, ale odporúčam)
@@ -95,10 +166,11 @@ Všetky videá sú v `videos/out/` ako **MP4 (H.264 + AAC)**. Prehrá ich hocič
 |---|---|
 | `course-m00-…free-lesson…mp4` | Video k lekcii zadarmo (už je aj na webe v `site/free/`) |
 | `course-m01-…` až `course-m09-…` | Videá kurzu pre kupujúcich (sú v ZIP-e) |
+| `pack-horror-…`, `pack-tycoon-…` | Videá Genre Packov, 5 pre každý (sú v ich ZIP-och) |
 | `ad-trailer-16x9.mp4` | Trailer na web (je v `site/media/`), YouTube, Facebook |
 | `ig-day1-…` až `ig-day7-…` | Instagram Reels na celý týždeň (9:16), s našim phonk beatom |
 | `ig-day…-nomusic.mp4` | Tie isté Reels bez hudby, na pridanie trendového songu priamo v Instagrame |
-| `ig-extra1-30-days`, `ig-extra2-pov-first-game` | Bonusové Reels o vysnenom výsledku (2. týždeň alebo platená reklama) |
+| `ig-extra1-30-days`, `ig-extra2-pov-first-game`, `ig-w2-…` | Reels na 2. týždeň (launch Horror a Tycoon Packu, lekcia zadarmo e-mailom, POV) |
 
 **Ako ich dostať na telefón:** stiahni ich z GitHubu (otvor súbor → **Download raw file**) alebo si ich pošli cez Google Drive / AirDrop / WhatsApp sebe.
 
@@ -108,7 +180,15 @@ Všetky videá sú v `videos/out/` ako **MP4 (H.264 + AAC)**. Prehrá ich hocič
 
 **Karusely:** v `social/carousels/<názov>/` sú obrázky `slide-01.png` a ďalšie. Na Instagrame daj nový príspevok, vyber všetky slidy v poradí.
 
-Celý plán s popiskami, hashtagmi a časmi je v **`social/INSTAGRAM-WEEK.md`**.
+Celý plán s popiskami, hashtagmi a časmi je v **`social/INSTAGRAM-WEEK.md`** (1. týždeň) a **`social/WEEK-2-AND-TIKTOK.md`** (2. týždeň).
+
+### 5.1 TikTok a YouTube Shorts
+
+Tie isté 9:16 videá môžeš dať aj na **TikTok** a **YouTube Shorts**. Tri platformy = trikrát viac ľudí bez práce navyše.
+
+- **TikTok:** nahraj verziu **s hudbou** (náš beat je vlastný, takže sa nestlmí), alebo `-nomusic` a pridaj trendový zvuk z TikTok knižnice. Popisky a hashtagy sú v `social/WEEK-2-AND-TIKTOK.md`. Prepni si účet na **Business** (Settings → Account), vtedy väčšinou môžeš dať odkaz na web do profilu hneď, bez 1 000 followerov. Ak to ešte nejde, do profilu napíš „free lesson → link on my Instagram“.
+- **YouTube Shorts:** v appke YouTube **+ → Create a Short → Upload**, vyber video s hudbou. Do popisu daj odkaz na web (v popise Shorts odkazy fungujú).
+- Neposielaj video s vodoznakom z inej platformy. Vždy nahraj originál z `videos/out/`.
 
 ## 6. Higgsfield (AI videá a obrázky)
 
@@ -161,7 +241,7 @@ Potom otvor novú session a Claude to vie spustiť priamo.
    ```
 
 ### 7.2 PDF
-Uprav text v `course/modules/*.md` a spusti `npm run build:pdf`.
+Uprav text v `course/modules/*.md` (kurz), `course/packs/*.md` (Genre Packy) alebo `SPUSTENIE.md` (tento návod) a spusti `npm run build:pdf`.
 
 ### 7.3 Videá
 Každé video je scenár v `videos/episodes/…/*.mjs` (text komentátora + scény). Na pregenerovanie treba aj Python a ffmpeg:
@@ -178,11 +258,14 @@ PYTHON=.venv/bin/python npm run build:video -- videos/episodes/ads/day4-lava.mjs
 ## 8. Kontrolný zoznam pred spustením
 
 - [ ] Web beží na Netlify
-- [ ] Formspree napojený, testovací zápis funguje a ponúkne lekciu zadarmo
-- [ ] Lemon Squeezy: 3 produkty, ZIP nahratý, testovací nákup prešiel, redirect na `thanks.html`
-- [ ] `CHECKOUT` odkazy vložené v `site/index.html`
+- [ ] MailerLite: 2 skupiny, API kľúč a ID skupín v Netlify, 2 automatizácie aktívne
+- [ ] Testovací zápis na webe → do minúty prišiel e-mail s lekciou zadarmo
+- [ ] Lemon Squeezy: 5 produktov, ZIP-y nahraté, webhook nastavený
+- [ ] Testovací nákup: e-mail so súbormi, uvítací e-mail, redirect na `thanks.html`
+- [ ] `CHECKOUT` odkazy (aj `horror` a `tycoon`) vložené v `site/index.html`
 - [ ] Discord a support e-mail v `thanks.html`, údaje v `privacy.html`
-- [ ] Instagram profil nastavený, týždeň naplánovaný v Meta Business Suite
+- [ ] Instagram profil nastavený, 2 týždne naplánované v Meta Business Suite
+- [ ] TikTok a YouTube Shorts účty založené
 - [ ] Starý Higgsfield kľúč zrušený
 - [ ] Živnosť (predaj je podnikanie). Ak máš menej ako 18 rokov, musí sa zapojiť rodič
 

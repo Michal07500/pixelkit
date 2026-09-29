@@ -49,6 +49,7 @@
   .lead { color: var(--muted); font-size: 19px; max-width: 620px; margin: 20px 0 0; }
   section { padding: 112px 0; border-top: 1px solid var(--line); }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 
   .btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 10px;
@@ -170,6 +171,8 @@
   .dlc p { margin: 0; color: var(--muted); font-size: 14px; }
   .dlc ul { margin: 4px 0 0; padding: 0; list-style: none; font-size: 14px; display: grid; gap: 4px; }
   .dlc li::before { content: "▸ "; color: var(--c); }
+  .dlc .live { font-family: var(--pixel); font-size: 10px; color: var(--c); margin-top: auto; padding-top: 12px; text-transform: uppercase; }
+  .dlc .btn-small { padding: 10px 14px; font-size: 14px; justify-content: center; }
   .dlc .soon { font-family: var(--pixel); font-size: 10px; color: var(--muted); margin-top: auto; padding-top: 12px; text-transform: uppercase; }
 
   /* Pricing */
@@ -473,11 +476,12 @@
     <ul class="stack">
       <li><b>9 narrated module videos</b><span>Code appears exactly when it's explained</span></li>
       <li><b>43 lessons in PDF workbooks</b><span>Every line of code, highlighted, with exercises</span></li>
-      <li><b>The full course in one PDF</b><span>61 pages you can search and print</span></li>
+      <li><b>The full course in one PDF</b><span>58 pages you can search and print</span></li>
       <li><b>Coin Rush, built step by step</b><span>Rounds, saving, shop, store, launch</span></li>
       <li class="bonus"><b>Luau Cheat Sheet</b><span>Syntax, services and patterns on a few pages</span></li>
       <li class="bonus"><b>Game Launch Checklist</b><span>From "almost done" to "live and growing"</span></li>
       <li class="bonus"><b>30 Game Ideas</b><span>Core loop, systems and monetization for each</span></li>
+      <li class="bonus"><b>Coin Rush Build Map</b><span>Every script, where it lives, and a final test plan</span></li>
       <li><b>Private Discord + future updates</b><span>New lessons are yours at no extra cost</span></li>
     </ul>
   </div>
@@ -508,7 +512,7 @@
           <li>All 9 modules, 43 lessons</li>
           <li>A narrated video for every module</li>
           <li>PDF workbooks with all the code</li>
-          <li>3 bonus PDFs</li>
+          <li>4 bonus PDFs</li>
           <li>Private Discord community</li>
         </ul>
         <a href="#join" class="btn" data-checkout="course">Get the course</a>
@@ -519,7 +523,8 @@
         <p class="note">One-time payment</p>
         <ul>
           <li>Everything in Core Course</li>
-          <li>Any 3 Genre Packs</li>
+          <li>Horror + Tycoon Packs, out now</li>
+          <li>+1 more Genre Pack of your choice at launch</li>
           <li>Drop-in, production-ready systems</li>
           <li>Private Discord community</li>
         </ul>
@@ -542,7 +547,7 @@
       <div class="shield-ico">14</div>
       <div><b>Try it for 14 days.</b> Work through the first modules. If it's not for you, email us and get every cent back. No questions, no hoops.</div>
     </div>
-    <p class="guarantee" style="margin-top:28px">Genre Packs release one by one. Bundle and All Access buyers get each pack the day it launches.</p>
+    <p class="guarantee" style="margin-top:28px">Horror and Tycoon Packs are out now. More Genre Packs release one by one, and All Access buyers get each one by email the day it launches.</p>
     <p class="guarantee" style="margin-top:8px"><svg width="16" height="16" viewBox="0 0 4 4" shape-rendering="crispEdges" aria-hidden="true"><path fill="#c6ff3d" d="M0 2h1v1H0zM1 3h1v1H1zM2 2h1v1H2zM3 1h1v1H3z"/></svg>14-day money-back guarantee. Not for you? Email us for a full refund.</p>
   </div>
 </section>
@@ -592,13 +597,13 @@
     <div>
       <div class="eyebrow">Early access</div>
       <h2>Get the free lesson. Lock in launch pricing.</h2>
-      <p class="lead">Drop your email and we'll send the intro-screen lesson right away, plus early-access pricing the day we launch. No spam, ever.</p>
+      <p class="lead">Drop your email and the intro-screen lesson (PDF + narrated video) lands in your inbox within a minute. No spam, ever.</p>
     </div>
     <form class="wl" id="wl" novalidate>
       <div class="field">
         <label for="email" class="sr">Email address</label>
         <input id="email" name="email" type="email" required placeholder="you@email.com" autocomplete="email">
-        <button class="btn" type="submit">Join the list</button>
+        <button class="btn" type="submit">Send me the lesson</button>
       </div>
       <label for="level" class="sr">Your experience</label>
       <select id="level" name="level">
@@ -606,6 +611,7 @@
         <option value="some">I've messed around in Studio</option>
         <option value="experienced">I already build games</option>
       </select>
+      <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
       <label class="consent"><input type="checkbox" name="consent" required> I agree to receive emails about PIXEL KIT. Unsubscribe anytime. <a href="privacy.html">Privacy policy</a>.</label>
       <p class="form-msg" id="formMsg" role="status" aria-live="polite"></p>
     </form>
@@ -626,15 +632,18 @@
   // SETTINGS: fill these in before going live
   // ============================================================
   const CONFIG = {
-    // Email collection endpoint (e.g. Formspree: https://formspree.io/f/XXXXXXX).
+    // Email signup endpoint. "/api/subscribe" is the built-in Netlify function (netlify/functions/subscribe.mjs):
+    // it adds the email to MailerLite, and MailerLite automatically emails the free lesson.
     // While empty, the form shows a notice instead of submitting.
-    FORM_ENDPOINT: "",
+    FORM_ENDPOINT: "/api/subscribe",
     // Checkout links (Lemon Squeezy recommended, or Gumroad / Stripe Payment Links).
     // Lemon Squeezy links open as an overlay on this page. While empty, buy buttons scroll to the waitlist.
     CHECKOUT: {
       course: "",
       bundle: "",
       all: "",
+      horror: "",   // Horror Pack
+      tycoon: "",   // Tycoon Pack
     },
     // Optional: end of the founding-member price, e.g. "2026-11-01T23:59:00+01:00". Shows a live countdown in the hero.
     // Leave empty for no countdown. Only set a real deadline you will keep.
@@ -645,11 +654,7 @@
       photo: "",   // e.g. "media/founder.jpg"
       text: "",
     },
-    // Where subscribers download the free lesson after signing up (files live in site/free/).
-    FREE_LESSON: {
-      pdf: "free/pixelkit-free-lesson.pdf",
-      video: "free/pixelkit-free-lesson.mp4",
-    },
+    // The free lesson is delivered by email (files live in site/free/, linked from the MailerLite email).
   };
 
   const MODULES = [
@@ -666,9 +671,9 @@
 
   const PACKS = [
     { n: "Obby Pack", c: "var(--accent)", p: "$12", d: "Parkour players come back to.", i: ["Checkpoints and stages", "Moving and vanishing platforms", "Skip-stage purchases"] },
-    { n: "Tycoon Pack", c: "var(--yellow)", p: "$19", d: "One of Roblox's biggest genres.", i: ["Purchase buttons", "Droppers and collectors", "Rebirth system"] },
+    { n: "Tycoon Pack", c: "var(--yellow)", p: "$19", d: "One of Roblox's biggest genres.", i: ["Plots that save progress", "Buttons, droppers, conveyors", "Rebirths and 2 game passes"], buy: "tycoon" },
     { n: "Simulator Pack", c: "var(--cyan)", p: "$19", d: "Collect, upgrade, repeat.", i: ["Collecting and backpacks", "Pets and egg hatching", "Zones and unlocks"] },
-    { n: "Horror Pack", c: "var(--pink)", p: "$19", d: "Fear that actually works.", i: ["AI monster with pathfinding", "Flashlight, audio, atmosphere", "Lag-free jumpscares"] },
+    { n: "Horror Pack", c: "var(--pink)", p: "$19", d: "Fear that actually works.", i: ["AI monster with pathfinding", "Flashlight, audio, atmosphere", "Lag-free jumpscares"], buy: "horror" },
     { n: "Heist Pack", c: "var(--accent)", p: "$24", d: "Stealth, crews and the getaway.", i: ["Stealth and detection", "Lasers, cameras, vaults", "Team roles and escape"] },
     { n: "Tower Defense Pack", c: "var(--yellow)", p: "$24", d: "Waves, towers, strategy.", i: ["Enemies on a path", "Tower placement", "Wave scaling and difficulty"] },
     { n: "Pixel UI Kit", c: "var(--cyan)", p: "$12", d: "Ready-made pixel-style UI.", i: ["Menus, shop, inventory", "Intro splash and loading", "Mobile-ready layouts"] },
@@ -692,13 +697,16 @@
   const cssVar = v => getComputedStyle(document.documentElement).getPropertyValue(v.slice(4, -1)).trim();
   const pixelArt = color => `<svg class="dlc-art" viewBox="0 0 6 6" shape-rendering="crispEdges" aria-hidden="true"><rect width="6" height="6" fill="#000"/><path fill="${color}" d="M1 1h4v1H1zM1 2h1v3H1zM4 2h1v3H4zM2 4h2v1H2zM2.5 2.5h1v1h-1z"/></svg>`;
 
+  PACKS.sort((a, b) => Boolean(b.buy) - Boolean(a.buy));
   document.getElementById("dlcs").innerHTML = PACKS.map(x => `
     <article class="dlc" style="--c:${x.c}">
       <div class="dlc-top">${pixelArt(cssVar(x.c))}<span class="dlc-price">${esc(x.p)}</span></div>
       <h3>${esc(x.n)}</h3>
       <p>${esc(x.d)}</p>
       <ul>${x.i.map(i => `<li>${esc(i)}</li>`).join("")}</ul>
-      <span class="soon">Coming soon</span>
+      ${x.buy
+        ? `<span class="live">Out now · PDF + 5 videos</span><a href="#pricing" class="btn btn-small" data-checkout="${x.buy}">Get the ${esc(x.n)} →</a>`
+        : `<span class="soon">Coming soon</span>`}
     </article>`).join("");
 
   let lemonLoaded = false;
@@ -775,11 +783,11 @@
       const res = await fetch(CONFIG.FORM_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ email, level: form.level.value }),
+        body: JSON.stringify({ email, level: form.level.value, consent: true, website: form.website.value }),
       });
       if (!res.ok) throw new Error(res.status);
       form.reset();
-      msg.innerHTML = `You're in! Your free lesson: <a href="${CONFIG.FREE_LESSON.pdf}" download>PDF</a> · <a href="${CONFIG.FREE_LESSON.video}" target="_blank" rel="noopener">narrated video</a>`;
+      msg.innerHTML = `<b>Check your inbox!</b> The free lesson is on its way to ${esc(email)}. Nothing there in 2 minutes? Look in Promotions or Spam.`;
     } catch {
       msg.textContent = "Something went wrong. Please try again in a moment.";
     } finally {

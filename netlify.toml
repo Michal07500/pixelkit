@@ -1,3 +1,9 @@
-# Netlify deploys only the public website, not the plan or video sources.
+# Netlify deploys the public website from site/ and the two email functions from netlify/functions/.
+# Functions only deploy when the site is connected to the Git repository (not with drag & drop).
 [build]
   publish = "site"
+  command = ""
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"

@@ -7,8 +7,10 @@
 //   01-…09-*.pdf                      one PDF per module
 //   pixelkit-full-course.pdf          everything, with a course cover and table of contents
 //   bonus-*.pdf                       bonus PDFs from course/bonuses/
+//   pack-*.pdf                        Genre Packs from course/packs/ (sold separately)
+//   docs/PIXEL-KIT-Navod.pdf          the Slovak launch guide (SPUSTENIE.md), for the owner
 
-import { readFileSync, writeFileSync, readdirSync, mkdirSync, rmSync } from "node:fs";
+import { readFileSync, writeFileSync, readdirSync, mkdirSync, rmSync, existsSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { Marked } from "marked";
@@ -28,7 +30,9 @@ const marked = new Marked({
     code({ text, lang }) {
       const language = lang && hljs.getLanguage(lang) ? lang : "plaintext";
       const html = language === "plaintext" ? esc(text) : hljs.highlight(text, { language }).value;
-      return `<pre class="code"><code class="hljs lang-${language}">${html}</code></pre>\n`;
+      // Long listings may split across pages; short ones stay together.
+      const long = text.split("\n").length > 36 ? " long" : "";
+      return `<pre class="code${long}"><code class="hljs lang-${language}">${html}</code></pre>\n`;
     },
   },
 });
@@ -44,7 +48,7 @@ function render(md) {
   html = html.replace(/<h3>Try it<\/h3>\s*(<ol>[\s\S]*?<\/ol>|<ul>[\s\S]*?<\/ul>)/g,
     (_, list) => `<div class="tryit"><div class="tryit-label">Try it</div>${list}</div>`);
   // Lesson headings: <h2>3.4 Functions</h2> → number chip
-  html = html.replace(/<h2>(\d+\.\d+)\s+([^<]+)<\/h2>/g,
+  html = html.replace(/<h2>([A-Z0-9]+\.\d+)\s+([^<]+)<\/h2>/g,
     (_, n, t) => `<h2 class="lesson"><span class="num">${n}</span>${t}</h2>`);
   return html;
 }
@@ -87,6 +91,7 @@ li { margin: 2pt 0; }
 li::marker { color: #6f9a00; font-weight: 600; }
 code { font: 8.6pt "JetBrains Mono", monospace; background: #f0f0f5; color: #3a1d6e; padding: 0.5pt 3.5pt; border-radius: 3pt; }
 pre.code { background: #0e0e13; color: #e6e6ee; border-radius: 6pt; padding: 11pt 13pt; margin: 6pt 0 12pt; border-left: 3pt solid #c6ff3d; break-inside: avoid; white-space: pre-wrap; word-break: break-word; }
+pre.code.long { break-inside: auto; }
 pre.code code { background: none; color: inherit; padding: 0; font-size: 8.3pt; line-height: 1.55; }
 code, pre { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; tab-size: 3; }
 .hljs-keyword, .hljs-built_in.hljs-keyword { color: #ff6fb3; }
@@ -129,6 +134,11 @@ li > input[type=checkbox] { appearance: none; position: absolute; left: 0; top: 
 .cover ol li span { font: 400 9pt Silkscreen, monospace; color: #c6ff3d; width: 30pt; padding-top: 2pt; }
 .cover .foot { margin-top: 18pt; font-size: 8.5pt; color: #8a8a99; display: flex; justify-content: space-between; }
 .course-cover h1 { font-size: 54pt; }
+.pack-cover .eyebrow, .pack-cover .bignum { color: var(--pc); }
+.pack-cover .bignum { font-size: 64pt; line-height: 1; margin: 10pt 0 14pt; }
+.pack-cover::after { background: radial-gradient(circle, color-mix(in srgb, var(--pc) 24%, transparent), transparent 62%); }
+.pack-cover .ship b { background: var(--pc); }
+.pack-cover ol li span { color: var(--pc); }
 .course-cover .lead { font-size: 13pt; color: #b8b8c8; max-width: 140mm; margin: 0 0 20pt; }
 
 /* Table of contents */
@@ -216,6 +226,44 @@ docs.push({
     courseCover + toc + modules.map((m) => moduleCover(m) + `<main class="module">${m.html}</main>`).join("")),
 });
 
+// Genre Packs (course/packs/<slug>.md with "# Name Pack · Subtitle")
+const PACK_COLORS = { horror: "#ff4fa3", tycoon: "#ffd23d", obby: "#c6ff3d", simulator: "#5ee6ff" };
+const packFiles = existsSync(join(COURSE, "packs")) ? readdirSync(join(COURSE, "packs")).filter((f) => f.endsWith(".md")).sort() : [];
+for (const file of packFiles) {
+  const slug = file.replace(/\.md$/, "");
+  const md = readFileSync(join(COURSE, "packs", file), "utf8");
+  const [, name, subtitle] = md.match(/^#\s+(.+?)\s+·\s+(.+)$/m);
+  const ship = (md.match(/^\*\*You'll ship:\*\*\s*(.+)$/m) || [])[1] || "";
+  const lessons = [...md.matchAll(/^##\s+([A-Z]\.\d+)\s+(.+)$/gm)].map((m) => ({ n: m[1], t: m[2] }));
+  const body = md.replace(/^#\s+.*$/m, "").replace(/^\*\*You'll ship:\*\*.*$/m, "");
+  const c = PACK_COLORS[slug] || "#c6ff3d";
+  const cover = `<section class="cover pack-cover" style="--pc:${c}">
+    <div class="brand">${LOGO}PIXEL KIT</div>
+    <div class="eyebrow">Genre Pack · ${lessons.length} lessons</div>
+    <div class="bignum">${esc(name.replace(/\s*Pack$/, "").toUpperCase())}</div>
+    <h1>${esc(subtitle)}</h1>
+    ${ship ? `<div class="ship"><b>YOU'LL SHIP</b>${esc(ship.charAt(0).toUpperCase() + ship.slice(1))}</div>` : ""}
+    <ol>${lessons.map((l) => `<li><span>${l.n}</span>${esc(l.t)}</li>`).join("")}</ol>
+    <div class="foot"><span>PIXEL KIT is not affiliated with Roblox Corporation.</span><span>pixelkit</span></div>
+  </section>`;
+  docs.push({ name: `pack-${slug}`, title: `${name} · ${subtitle}`, html: page(`${name} · ${subtitle}`, cover + `<main class="module">${render(body)}</main>`) });
+}
+
+// Owner's launch guide (Slovak)
+const guideMd = readFileSync(join(ROOT, "SPUSTENIE.md"), "utf8");
+const guideTitle = (guideMd.match(/^#\s+(.+)$/m) || [])[1] || "Návod";
+const guideCover = `<section class="cover">
+  <div class="brand">${LOGO}PIXEL KIT</div>
+  <div class="eyebrow">Návod pre majiteľa</div>
+  <h1>${esc(guideTitle)}</h1>
+  <div class="ship"><b>OBSAH</b>Web · e-maily · platby · videá · Instagram a TikTok</div>
+  <div class="foot" style="margin-top:auto"><span>Interný dokument, nezdieľaj ho so zákazníkmi.</span><span>pixelkit</span></div>
+</section>`;
+docs.push({
+  name: "PIXEL-KIT-Navod", out: join(ROOT, "docs"), title: guideTitle,
+  html: page(guideTitle, guideCover + `<main>${render(guideMd.replace(/^#\s+.*$/m, ""))}</main>`).replace('lang="en"', 'lang="sk"'),
+});
+
 rmSync(BUILD, { recursive: true, force: true });
 mkdirSync(BUILD, { recursive: true });
 
@@ -226,8 +274,10 @@ for (const doc of docs) {
   writeFileSync(htmlPath, doc.html);
   await pageObj.goto(pathToFileURL(htmlPath).href, { waitUntil: "load" });
   await pageObj.evaluate(() => document.fonts.ready);
-  await pageObj.pdf({ path: join(OUT, `${doc.name}.pdf`), format: "A4", printBackground: true, preferCSSPageSize: true });
-  console.log(`course/pdf/${doc.name}.pdf`);
+  const outDir = doc.out || OUT;
+  mkdirSync(outDir, { recursive: true });
+  await pageObj.pdf({ path: join(outDir, `${doc.name}.pdf`), format: "A4", printBackground: true, preferCSSPageSize: true });
+  console.log(join(outDir, `${doc.name}.pdf`).replace(ROOT + "/", ""));
 }
 await browser.close();
 rmSync(BUILD, { recursive: true, force: true });

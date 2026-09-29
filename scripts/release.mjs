@@ -5,6 +5,7 @@
 // 1. site/free/   ← free lesson PDF + narrated video (downloaded after email signup)
 // 2. site/media/  ← the hero reel (9:16) + poster frame for the landing page
 // 3. dist/PIXEL-KIT-Core-Course.zip ← what buyers download (upload it as the product file)
+// 4. dist/PIXEL-KIT-<Name>-Pack.zip  ← one ZIP per Genre Pack (PDF + narrated videos)
 //
 // Env: FFMPEG (default ffmpeg) for the poster frame.
 
@@ -45,7 +46,7 @@ else console.warn("Could not extract the poster frame (is ffmpeg installed?). Th
 
 // 3. The paid course download
 const zip = new AdmZip();
-const pdfs = readdirSync(p("course/pdf")).filter((f) => f.endsWith(".pdf")).sort();
+const pdfs = readdirSync(p("course/pdf")).filter((f) => f.endsWith(".pdf") && !f.startsWith("pack-")).sort();
 for (const f of pdfs) zip.addLocalFile(p("course/pdf", f), "PDF");
 const videos = readdirSync(p("videos/out")).filter((f) => /^course-m\d\d-.*\.mp4$/.test(f)).sort();
 if (videos.length < 10) console.warn(`Only ${videos.length}/10 course videos found in videos/out.`);
@@ -60,7 +61,7 @@ How to use this course
 4. Repeat for modules 02 to 09. By the end, Coin Rush is live on Roblox.
 
 PDF/pixelkit-full-course.pdf contains every module in one file.
-PDF/bonus-*.pdf are your bonuses: Luau Cheat Sheet, Game Launch Checklist, 30 Game Ideas.
+PDF/bonus-*.pdf are your bonuses: Luau Cheat Sheet, Game Launch Checklist, 30 Game Ideas, Coin Rush Build Map.
 
 Questions or problems? Reply to your receipt email.
 PIXEL KIT is not affiliated with Roblox Corporation.
@@ -69,3 +70,34 @@ mkdirSync(p("dist"), { recursive: true });
 const out = p("dist/PIXEL-KIT-Core-Course.zip");
 zip.writeZip(out);
 console.log(`dist/PIXEL-KIT-Core-Course.zip  (${mb(out)}, ${pdfs.length} PDFs, ${videos.length} videos)`);
+
+// 4. Genre Packs
+const PACKS = {
+  horror: { name: "Horror", game: "Night Shift", first: "h1-atmosphere" },
+  tycoon: { name: "Tycoon", game: "Pizza Tycoon", first: "t1-foundation" },
+};
+for (const [slug, pack] of Object.entries(PACKS)) {
+  const pdf = p("course/pdf", `pack-${slug}.pdf`);
+  if (!existsSync(pdf)) { console.warn(`Skipping ${pack.name} Pack: build the PDF first (npm run build:pdf).`); continue; }
+  const packZip = new AdmZip();
+  packZip.addLocalFile(pdf, "", `PIXEL-KIT-${pack.name}-Pack.pdf`);
+  const clips = readdirSync(p("videos/out")).filter((f) => f.startsWith(`pack-${slug}-`) && f.endsWith(".mp4")).sort();
+  if (clips.length < 5) console.warn(`${pack.name} Pack: only ${clips.length}/5 videos found in videos/out.`);
+  for (const f of clips) packZip.addLocalFile(p("videos/out", f), "Videos", f.replace(`pack-${slug}-`, ""));
+  packZip.addFile("START HERE.txt", Buffer.from(
+`PIXEL KIT · ${pack.name} Pack
+
+You'll build ${pack.game}, lesson by lesson.
+
+1. Open Videos/${pack.first}.mp4 and watch it.
+2. Open PIXEL-KIT-${pack.name}-Pack.pdf next to Roblox Studio and follow the same lesson.
+3. Every script starts with a comment saying exactly where it goes.
+4. Do the "Try it" steps before moving on, then continue with the next video.
+
+Questions or problems? Reply to your receipt email.
+PIXEL KIT is not affiliated with Roblox Corporation.
+`));
+  const packOut = p("dist", `PIXEL-KIT-${pack.name}-Pack.zip`);
+  packZip.writeZip(packOut);
+  console.log(`dist/PIXEL-KIT-${pack.name}-Pack.zip  (${mb(packOut)}, ${clips.length} videos)`);
+}
