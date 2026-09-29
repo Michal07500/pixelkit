@@ -35,6 +35,13 @@ Seven days of ready-to-post content. Every Reel is built on an emotional hook, c
 | Sat | Reel | `videos/out/ig-day6-inside.mp4` | Imagine sending your friends a link to YOUR game |
 | Sun | Reel | `videos/out/ig-day7-free-lesson.mp4` | Every big game opens with a logo intro. Yours can too. |
 
+**Bonus Reels** (post in week 2, or boost as paid ads — they sell the dream outcome):
+
+| When | File | Hook |
+|---|---|---|
+| Week 2 Mon | `videos/out/ig-extra1-30-days.mp4` | 30 days from now: your own game, or 30 more days of playing other people's |
+| Week 2 Wed | `videos/out/ig-extra2-pov-first-game.mp4` | POV: you just hit Publish on your first Roblox game |
+
 **Stories every day** (5 minutes of work): repost the day's Reel to your Story with a poll sticker ("Would you play Coin Rush? Yes / Yes!!"), or a question sticker ("What game would you build?"). Stories build the relationship; Reels bring new people.
 
 ---
@@ -163,3 +170,32 @@ Free lesson: PDF + narrated video, with the full script explained line by line.
 - In **Insights**, find the Reel with the best 3-second hold and shares. Make 3 more on that topic.
 - Reels with a clear "save this" tutorial usually get the most saves; reels with a strong opinion get the most comments. Do both.
 - Reuse every Reel on **TikTok** and **YouTube Shorts** (same files).
+
+## Bonus Reel captions
+
+### 30 days
+```
+30 days from now you could have your own game on Roblox. 🎮
+Or 30 more days of playing other people's.
+
+Week 1: your world 🏗️
+Week 2: it comes alive 🌋
+Week 3: it remembers 💾
+Week 4: it's LIVE 🚀
+
+Day 1 starts free 👉 link in bio
+
+#robloxstudio #roblox #30daychallenge #gamedev #learntocode #robloxdev
+```
+
+### POV: first game
+```
+POV: you just hit Publish on your first Roblox game 😳
+
+A stranger joins. They keep playing. Someone you've never met hits like.
+You made that. 🥹
+
+Your POV starts here. First lesson free, link in bio.
+
+#roblox #robloxstudio #pov #gamedev #indiedev #robloxdev
+```

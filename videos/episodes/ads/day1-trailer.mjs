@@ -6,7 +6,7 @@ export default {
   badge: "NEW · ROBLOX COURSE",
   style: "adhd",
   music: "phonk",
-  musicDb: -23,
+  musicDb: -21,
   speed: 1.18,
   segments: [
     {

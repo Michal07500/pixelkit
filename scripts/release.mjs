@@ -3,7 +3,7 @@
 //   node scripts/release.mjs
 //
 // 1. site/free/   ← free lesson PDF + narrated video (downloaded after email signup)
-// 2. site/media/  ← 16:9 trailer + poster frame for the landing page
+// 2. site/media/  ← the hero reel (9:16) + poster frame for the landing page
 // 3. dist/PIXEL-KIT-Core-Course.zip ← what buyers download (upload it as the product file)
 //
 // Env: FFMPEG (default ffmpeg) for the poster frame.
@@ -37,10 +37,10 @@ function copy(from, to) {
 copy(p("course/pdf/00-free-lesson-intro-screen.pdf"), p("site/free/pixelkit-free-lesson.pdf"));
 copy(p("videos/out/course-m00-free-lesson-intro-screen.mp4"), p("site/free/pixelkit-free-lesson.mp4"));
 
-// 2. Trailer on the landing page
-copy(p("videos/out/ad-trailer-16x9.mp4"), p("site/media/trailer.mp4"));
-const poster = spawnSync(FFMPEG, ["-y", "-loglevel", "error", "-ss", "4.5", "-i", p("site/media/trailer.mp4"), "-frames:v", "1", "-q:v", "3", p("site/media/trailer-poster.jpg")]);
-if (poster.status === 0) console.log("site/media/trailer-poster.jpg");
+// 2. Autoplaying reel in the hero phone
+copy(p("videos/out/ig-day1-trailer.mp4"), p("site/media/reel.mp4"));
+const poster = spawnSync(FFMPEG, ["-y", "-loglevel", "error", "-ss", "6.4", "-i", p("site/media/reel.mp4"), "-frames:v", "1", "-vf", "scale=540:-1", "-q:v", "4", p("site/media/reel-poster.jpg")]);
+if (poster.status === 0) console.log("site/media/reel-poster.jpg");
 else console.warn("Could not extract the poster frame (is ffmpeg installed?). The video still works without it.");
 
 // 3. The paid course download
@@ -60,6 +60,7 @@ How to use this course
 4. Repeat for modules 02 to 09. By the end, Coin Rush is live on Roblox.
 
 PDF/pixelkit-full-course.pdf contains every module in one file.
+PDF/bonus-*.pdf are your bonuses: Luau Cheat Sheet, Game Launch Checklist, 30 Game Ideas.
 
 Questions or problems? Reply to your receipt email.
 PIXEL KIT is not affiliated with Roblox Corporation.

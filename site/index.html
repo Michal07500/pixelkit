@@ -235,6 +235,68 @@
   .shot img { width: 100%; height: auto; display: block; }
   .shot figcaption { font-size: 14px; color: var(--muted); padding: 10px 4px 2px; }
   @media (max-width: 980px) { .inside-grid { grid-template-columns: 1fr 1fr; } .shot.wide { grid-column: 1 / -1; } }
+  /* Hero phone */
+  .trust { list-style: none; padding: 0; margin: 22px 0 0; display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 14px; color: var(--muted); }
+  .trust li::before { content: "✓ "; color: var(--accent); font-weight: 700; }
+  .phone-wrap { position: relative; display: grid; place-items: center; min-height: 600px; }
+  .phone { position: relative; width: 300px; aspect-ratio: 9 / 16; border-radius: 38px; border: 10px solid #1d1d26; background: #000; overflow: hidden; box-shadow: 0 50px 120px -30px rgba(198,255,61,.35), 14px 14px 0 var(--line); transform: rotate(2.5deg); }
+  .phone video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .phone .sound { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); font: 600 13px "Space Grotesk", sans-serif; background: rgba(7,7,10,.8); color: #fff; border: 1px solid var(--line-2); padding: 8px 14px; border-radius: 999px; cursor: pointer; white-space: nowrap; }
+  .chip { position: absolute; font: 600 14px "Space Grotesk", sans-serif; background: var(--card-2); border: 1px solid var(--line-2); padding: 10px 14px; box-shadow: 6px 6px 0 var(--line); white-space: nowrap; }
+  .chip.c1 { top: 60px; left: -10px; transform: rotate(-4deg); border-color: var(--accent); }
+  .chip.c2 { top: 48%; right: -18px; transform: rotate(3deg); }
+  .chip.c3 { bottom: 70px; left: 0; transform: rotate(-2deg); }
+  #dealTag { background: var(--pink); }
+  @media (max-width: 980px) { .phone-wrap { min-height: 0; padding: 20px 0; } .chip { display: none; } .phone { width: 260px; } }
+
+  /* Roadmap */
+  .weeks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 48px; }
+  .week { background: var(--card); border: 1px solid var(--line); padding: 26px; position: relative; }
+  .week.hot { border-color: var(--accent); box-shadow: 6px 6px 0 var(--accent-deep); }
+  .week .wk { font-family: var(--pixel); font-size: 13px; color: var(--accent); }
+  .week h3 { font-size: 22px; margin: 12px 0 8px; }
+  .week p { color: var(--muted); font-size: 15px; margin: 0 0 14px; }
+  .week small { font-size: 13px; color: #6b6b80; }
+  .day30 { margin-top: 32px; font-family: var(--display); font-size: 26px; font-weight: 600; letter-spacing: -0.02em; }
+  .day30 b { color: var(--accent); }
+  @media (max-width: 980px) { .weeks { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .weeks { grid-template-columns: 1fr; } }
+
+  /* Value stack */
+  .stack-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 56px; align-items: start; }
+  .stack { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  .stack li { display: grid; grid-template-columns: 22px 1fr; column-gap: 14px; padding: 16px 18px; background: var(--card); border: 1px solid var(--line); }
+  .stack li::before { content: ""; grid-row: span 2; width: 14px; height: 14px; margin-top: 5px; background: var(--accent); }
+  .stack li b { font-family: var(--display); font-size: 17px; }
+  .stack li span { color: var(--muted); font-size: 14px; }
+  .stack li.bonus { border-color: rgba(255,210,61,.5); }
+  .stack li.bonus::before { background: var(--yellow); }
+  .stack li.bonus b::before { content: "BONUS"; font: 400 10px var(--pixel); background: var(--yellow); color: #1a1400; padding: 2px 6px; margin-right: 8px; vertical-align: 2px; }
+  @media (max-width: 980px) { .stack-grid { grid-template-columns: 1fr; gap: 32px; } }
+
+  /* Founder */
+  .founder-grid { display: grid; grid-template-columns: 220px 1fr; gap: 40px; align-items: center; }
+  .founder img { width: 220px; height: 220px; object-fit: cover; border: 1px solid var(--line-2); box-shadow: 10px 10px 0 var(--line); image-rendering: auto; }
+  @media (max-width: 700px) { .founder-grid { grid-template-columns: 1fr; } }
+
+  /* Guarantee */
+  .shield { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: center; max-width: 760px; margin: 40px auto 0; padding: 22px 26px; border: 1px solid var(--accent); background: rgba(198,255,61,.05); font-size: 16px; color: #d6d6e0; }
+  .shield b { color: var(--text); }
+  .shield-ico { width: 64px; height: 64px; display: grid; place-items: center; font: 700 24px var(--pixel); color: var(--accent-ink); background: var(--accent); clip-path: polygon(50% 0, 100% 18%, 100% 60%, 50% 100%, 0 60%, 0 18%); }
+
+  /* Closer */
+  .closer { text-align: center; }
+  .closer h2 { max-width: 980px; margin: 0 auto; }
+  .cta-row.center { justify-content: center; margin-top: 40px; }
+
+  /* Sticky mobile CTA */
+  .sticky { display: none; }
+  @media (max-width: 760px) {
+    .sticky { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: rgba(7,7,10,.94); backdrop-filter: blur(10px); border-top: 1px solid var(--line-2); font-size: 14px; transform: translateY(110%); transition: transform .2s; }
+    .sticky.on { transform: none; }
+    .sticky .btn { padding: 10px 16px; font-size: 14px; }
+    footer { padding-bottom: 96px; }
+  }
   footer { padding: 48px 0; color: var(--muted); font-size: 14px; }
   footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; }
   footer p { margin: 0; max-width: 640px; }
@@ -273,45 +335,50 @@
 <header class="hero">
   <div class="wrap hero-grid">
     <div>
-      <div class="badge"><b>SOON</b> Early-access pricing for the first members</div>
-      <h1>Learn Roblox Studio. <span class="hl">Ship real games.</span></h1>
-      <p class="lead">A project-based course that takes you from an empty baseplate to a published, monetized Roblox game. No experience required. Just a laptop and the drive to build.</p>
+      <div class="badge"><b id="dealTag">FOUNDERS</b> <span id="dealText">Founding-member price. It goes up at launch.</span></div>
+      <h1>Stop playing. <span class="hl">Start building.</span></h1>
+      <p class="lead">Go from zero to your own published Roblox game, with a store that can earn Robux, in 9 modules. No coding experience needed.</p>
       <div class="cta-row">
-        <a href="#join" class="btn btn-primary">Get the free lesson <span class="arrow">→</span></a>
-        <a href="#curriculum" class="btn">View curriculum</a>
+        <a href="#pricing" class="btn btn-primary" data-checkout="course">Get PIXEL KIT · $29 <span class="arrow">→</span></a>
+        <a href="#join" class="btn">Try a free lesson</a>
       </div>
+      <ul class="trust">
+        <li>14-day money-back guarantee</li>
+        <li>Pay once, keep forever</li>
+        <li>Windows &amp; Mac</li>
+      </ul>
       <div class="facts">
         <div><b>9</b>modules</div>
         <div><b>43</b>lessons</div>
-        <div><b>1</b>shipped game</div>
-        <div><b>∞</b>lifetime access</div>
+        <div><b>+3</b>bonuses</div>
+        <div><b>1</b>game you ship</div>
       </div>
     </div>
 
-    <div class="studio" aria-label="Code sample from the free lesson">
-      <div class="studio-bar"><i class="dot r"></i><i class="dot y"></i><i class="dot g"></i><span>ReplicatedFirst / IntroSplash.lua</span></div>
-<pre class="code"><span class="c">-- Lesson 4.1: a studio-grade intro screen</span>
-<span class="k">local</span> TweenService = game:<span class="f">GetService</span>(<span class="s">"TweenService"</span>)
-
-<span class="k">local</span> fadeIn = TweenService:<span class="f">Create</span>(logo,
-  TweenInfo.<span class="f">new</span>(<span class="n">0.25</span>, Enum.EasingStyle.Back),
-  { ImageTransparency = <span class="n">0</span> })
-
-fadeIn:<span class="f">Play</span>()
-task.<span class="f">wait</span>(<span class="n">2</span>)
-screenGui:<span class="f">Destroy</span>()</pre>
-      <div class="studio-out"><span>▶ Running</span><span>0 errors · 0 warnings</span></div>
+    <div class="phone-wrap">
+      <div class="phone">
+        <video id="reel" src="media/reel.mp4" poster="media/reel-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="PIXEL KIT trailer"></video>
+        <button class="sound" id="soundBtn" type="button">🔊 Tap for sound</button>
+      </div>
+      <div class="chip c1">🎮 Your game, live on Roblox</div>
+      <div class="chip c2">⚡ Zero experience needed</div>
+      <div class="chip c3">🧠 Real Luau code</div>
     </div>
   </div>
 </header>
 
-<section id="trailer" class="trailer">
+<section id="roadmap">
   <div class="wrap">
-    <div class="eyebrow">Watch</div>
-    <h2>Your game could be next.</h2>
-    <div class="video-frame">
-      <video src="media/trailer.mp4" poster="media/trailer-poster.jpg" controls playsinline preload="none"></video>
+    <div class="eyebrow">The plan</div>
+    <h2>Your own Roblox game in 30 days.</h2>
+    <p class="lead">About an hour a day for four weeks. Here's exactly what you'll have at the end of each one.</p>
+    <div class="weeks">
+      <div class="week"><span class="wk">WEEK 1</span><h3>Your world</h3><p>Studio mastered, your arena built, lighting that looks like a real studio made it.</p><small>Modules 1–2</small></div>
+      <div class="week"><span class="wk">WEEK 2</span><h3>It comes alive</h3><p>Lava that hurts, vanishing platforms, a logo intro, a main menu and a HUD.</p><small>Modules 3–4</small></div>
+      <div class="week"><span class="wk">WEEK 3</span><h3>It remembers</h3><p>Exploit-proof code, and coins, XP and levels that save between sessions.</p><small>Modules 5–6</small></div>
+      <div class="week hot"><span class="wk">WEEK 4</span><h3>It's live</h3><p>Rounds, an upgrade shop, a store that can earn Robux, and a public launch.</p><small>Modules 7–9</small></div>
     </div>
+    <p class="day30"><b>Day 30:</b> you send your friends a link to a game <span class="hl">you</span> made.</p>
   </div>
 </section>
 
@@ -396,6 +463,37 @@ screenGui:<span class="f">Destroy</span>()</pre>
   </div>
 </section>
 
+<section id="stack">
+  <div class="wrap stack-grid">
+    <div>
+      <div class="eyebrow">Everything you get</div>
+      <h2>One price. The whole toolkit.</h2>
+      <p class="lead">Everything you need to go from your first click in Studio to a published game, and the bonuses to build the next one.</p>
+    </div>
+    <ul class="stack">
+      <li><b>9 narrated module videos</b><span>Code appears exactly when it's explained</span></li>
+      <li><b>43 lessons in PDF workbooks</b><span>Every line of code, highlighted, with exercises</span></li>
+      <li><b>The full course in one PDF</b><span>61 pages you can search and print</span></li>
+      <li><b>Coin Rush, built step by step</b><span>Rounds, saving, shop, store, launch</span></li>
+      <li class="bonus"><b>Luau Cheat Sheet</b><span>Syntax, services and patterns on a few pages</span></li>
+      <li class="bonus"><b>Game Launch Checklist</b><span>From "almost done" to "live and growing"</span></li>
+      <li class="bonus"><b>30 Game Ideas</b><span>Core loop, systems and monetization for each</span></li>
+      <li><b>Private Discord + future updates</b><span>New lessons are yours at no extra cost</span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="founder" class="founder" hidden>
+  <div class="wrap founder-grid">
+    <img id="founderPhoto" alt="" width="220" height="220">
+    <div>
+      <div class="eyebrow">Who's teaching</div>
+      <h2 id="founderName"></h2>
+      <p class="lead" id="founderText"></p>
+    </div>
+  </div>
+</section>
+
 <section id="pricing">
   <div class="wrap">
     <div class="eyebrow">Pricing</div>
@@ -410,6 +508,7 @@ screenGui:<span class="f">Destroy</span>()</pre>
           <li>All 9 modules, 43 lessons</li>
           <li>A narrated video for every module</li>
           <li>PDF workbooks with all the code</li>
+          <li>3 bonus PDFs</li>
           <li>Private Discord community</li>
         </ul>
         <a href="#join" class="btn" data-checkout="course">Get the course</a>
@@ -438,6 +537,10 @@ screenGui:<span class="f">Destroy</span>()</pre>
         </ul>
         <a href="#join" class="btn" data-checkout="all">Get all access</a>
       </div>
+    </div>
+    <div class="shield">
+      <div class="shield-ico">14</div>
+      <div><b>Try it for 14 days.</b> Work through the first modules. If it's not for you, email us and get every cent back. No questions, no hoops.</div>
     </div>
     <p class="guarantee" style="margin-top:28px">Genre Packs release one by one. Bundle and All Access buyers get each pack the day it launches.</p>
     <p class="guarantee" style="margin-top:8px"><svg width="16" height="16" viewBox="0 0 4 4" shape-rendering="crispEdges" aria-hidden="true"><path fill="#c6ff3d" d="M0 2h1v1H0zM1 3h1v1H1zM2 2h1v1H2zM3 1h1v1H3z"/></svg>14-day money-back guarantee. Not for you? Email us for a full refund.</p>
@@ -474,6 +577,16 @@ screenGui:<span class="f">Destroy</span>()</pre>
   </div>
 </section>
 
+<section id="closer" class="closer">
+  <div class="wrap">
+    <h2>A year from now, you'll have played 1,000 more hours.<br><span class="hl">Or you'll have built your own game.</span></h2>
+    <div class="cta-row center">
+      <a href="#pricing" class="btn btn-primary" data-checkout="course">Get PIXEL KIT · $29 <span class="arrow">→</span></a>
+      <a href="#join" class="btn">Start with the free lesson</a>
+    </div>
+  </div>
+</section>
+
 <section id="join" class="join">
   <div class="wrap join-grid">
     <div>
@@ -499,6 +612,8 @@ screenGui:<span class="f">Destroy</span>()</pre>
   </div>
 </section>
 
+<div class="sticky" id="sticky"><span><b>PIXEL KIT</b> · $29 founding price</span><a href="#pricing" class="btn btn-primary" data-checkout="course">Get it →</a></div>
+
 <footer>
   <div class="wrap">
     <p><span style="font-family:var(--pixel);color:var(--text)">PIXEL KIT</span> · © <span id="year"></span> · <a href="privacy.html">Privacy</a></p>
@@ -520,6 +635,15 @@ screenGui:<span class="f">Destroy</span>()</pre>
       course: "",
       bundle: "",
       all: "",
+    },
+    // Optional: end of the founding-member price, e.g. "2026-11-01T23:59:00+01:00". Shows a live countdown in the hero.
+    // Leave empty for no countdown. Only set a real deadline you will keep.
+    FOUNDING_DEADLINE: "",
+    // Optional: your founder card. Leave name empty to hide the section.
+    FOUNDER: {
+      name: "",
+      photo: "",   // e.g. "media/founder.jpg"
+      text: "",
     },
     // Where subscribers download the free lesson after signing up (files live in site/free/).
     FREE_LESSON: {
@@ -600,6 +724,41 @@ screenGui:<span class="f">Destroy</span>()</pre>
   });
 
   document.getElementById("year").textContent = new Date().getFullYear();
+
+  // Hero reel: tap for sound
+  const reel = document.getElementById("reel"), soundBtn = document.getElementById("soundBtn");
+  soundBtn.addEventListener("click", () => {
+    reel.muted = !reel.muted;
+    if (!reel.muted) { reel.currentTime = 0; reel.play(); }
+    soundBtn.textContent = reel.muted ? "🔊 Tap for sound" : "🔇 Mute";
+  });
+
+  // Founding-price countdown (only with a real deadline)
+  const deadline = CONFIG.FOUNDING_DEADLINE ? new Date(CONFIG.FOUNDING_DEADLINE) : null;
+  if (deadline && !isNaN(deadline)) {
+    const tick = () => {
+      const ms = deadline - Date.now();
+      if (ms <= 0) { document.getElementById("dealText").textContent = "Founding price has ended."; return; }
+      const d = Math.floor(ms / 864e5), h = Math.floor(ms / 36e5) % 24, m = Math.floor(ms / 6e4) % 60, sec = Math.floor(ms / 1e3) % 60;
+      document.getElementById("dealText").textContent = `Founding price ends in ${d}d ${String(h).padStart(2, "0")}h ${String(m).padStart(2, "0")}m ${String(sec).padStart(2, "0")}s`;
+      setTimeout(tick, 1000);
+    };
+    tick();
+  }
+
+  // Founder card
+  if (CONFIG.FOUNDER.name) {
+    document.getElementById("founder").hidden = false;
+    document.getElementById("founderName").textContent = `Hi, I'm ${CONFIG.FOUNDER.name}.`;
+    document.getElementById("founderText").textContent = CONFIG.FOUNDER.text;
+    const img = document.getElementById("founderPhoto");
+    if (CONFIG.FOUNDER.photo) { img.src = CONFIG.FOUNDER.photo; img.alt = CONFIG.FOUNDER.name; } else img.remove();
+  }
+
+  // Sticky buy bar on phones, after the hero
+  const sticky = document.getElementById("sticky");
+  const onScroll = () => sticky.classList.toggle("on", window.scrollY > 700 && window.innerHeight + window.scrollY < document.body.scrollHeight - 400);
+  window.addEventListener("scroll", onScroll, { passive: true });
 
   const form = document.getElementById("wl");
   const msg = document.getElementById("formMsg");

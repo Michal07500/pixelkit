@@ -6,6 +6,7 @@
 //   00-free-lesson-intro-screen.pdf   lead magnet
 //   01-…09-*.pdf                      one PDF per module
 //   pixelkit-full-course.pdf          everything, with a course cover and table of contents
+//   bonus-*.pdf                       bonus PDFs from course/bonuses/
 
 import { readFileSync, writeFileSync, readdirSync, mkdirSync, rmSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
@@ -107,9 +108,9 @@ tr:nth-child(even) td { background: #f7f7fa; }
 .callout.warn .callout-label { background: #ff4fa3; color: #fff; }
 .tryit { margin: 12pt 0; padding: 12pt 14pt 6pt; border: 1.4pt dashed #6f9a00; border-radius: 8pt; background: #fbfff2; break-inside: avoid; }
 .tryit-label { font: 700 9pt Silkscreen, monospace; color: #4d7a00; margin-bottom: 6pt; letter-spacing: .05em; }
-ul.contains-task-list { list-style: none; padding-left: 0; }
-li.task-list-item { display: flex; gap: 8pt; align-items: baseline; }
-li.task-list-item input { appearance: none; width: 9pt; height: 9pt; border: 1.4pt solid #6f9a00; border-radius: 2pt; margin: 0; flex: none; transform: translateY(1pt); }
+ul:has(> li > input[type=checkbox]) { list-style: none; padding-left: 0; }
+li:has(> input[type=checkbox]) { position: relative; padding-left: 17pt; }
+li > input[type=checkbox] { appearance: none; position: absolute; left: 0; top: 3.5pt; width: 9pt; height: 9pt; border: 1.4pt solid #6f9a00; border-radius: 2pt; margin: 0; }
 
 /* Cover pages */
 .cover { page: cover; break-after: page; height: 297mm; width: 210mm; background: #07070a; color: #f5f5f7; position: relative; overflow: hidden; padding: 26mm 20mm; display: flex; flex-direction: column; }
@@ -179,6 +180,24 @@ const docs = [
     html: page(`Module ${m.num} · ${m.title}`, moduleCover(m) + `<main class="module">${m.html}</main>`),
   })),
 ];
+
+// Bonuses (course/bonuses/NN-*.md with "# Bonus · Title")
+const bonusFiles = readdirSync(join(COURSE, "bonuses")).filter((f) => /^\d\d-.*\.md$/.test(f)).sort();
+for (const [i, file] of bonusFiles.entries()) {
+  const md = readFileSync(join(COURSE, "bonuses", file), "utf8");
+  const title = (md.match(/^#\s+Bonus\s+·\s+(.+)$/m) || [])[1] || file;
+  const ship = (md.match(/^\*\*You'll get:\*\*\s*(.+)$/m) || [])[1] || "";
+  const body = md.replace(/^#\s+Bonus.*$/m, "").replace(/^\*\*You'll get:\*\*.*$/m, "");
+  const cover = `<section class="cover">
+    <div class="brand">${LOGO}PIXEL KIT</div>
+    <div class="eyebrow">Bonus ${i + 1} of ${bonusFiles.length}</div>
+    <div class="bignum">+${i + 1}</div>
+    <h1>${esc(title)}</h1>
+    ${ship ? `<div class="ship"><b>YOU GET</b>${esc(ship.charAt(0).toUpperCase() + ship.slice(1))}</div>` : ""}
+    <div class="foot" style="margin-top:auto"><span>Learn Roblox Studio. Ship real games.</span><span>pixelkit</span></div>
+  </section>`;
+  docs.push({ name: `bonus-${file.replace(/\.md$/, "")}`, title: `Bonus · ${title}`, html: page(`Bonus · ${title}`, cover + `<main>${render(body)}</main>`) });
+}
 
 const courseCover = `<section class="cover course-cover">
   <div class="brand">${LOGO}PIXEL KIT</div>

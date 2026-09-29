@@ -390,7 +390,7 @@ def main():
 
     ml, mr = music_bed(duration, spec["music"].get("style", "calm"))
     music_gain = 10 ** (spec["music"].get("gain_db", -20) / 20) * 4
-    duck = 1 - 0.6 * smooth(env, 3)
+    duck = 1 - spec["music"].get("duck", 0.6) * smooth(env, 3)
     fade = np.ones(n)
     fi, fo = int(1.0 * SR), int(2.5 * SR)
     fade[:fi] = np.linspace(0, 1, fi)

@@ -128,7 +128,7 @@ for (const seg of segments) for (const b of seg.beats) {
 }
 
 // ---------------------------------------------------------------- 3. audio mix
-const mixSpec = { duration, fps: FPS, clips, events, music: { style: ep.music || "calm", gain_db: ep.musicDb ?? -20 }, out: join(work, "mix.wav"), envelope_out: join(work, "mouth.json"), out_nomusic: ENERGY ? join(work, "mix-nomusic.wav") : undefined };
+const mixSpec = { duration, fps: FPS, clips, events, music: { style: ep.music || "calm", gain_db: ep.musicDb ?? -20, duck: ADHD ? 0.55 : 0.6 }, out: join(work, "mix.wav"), envelope_out: join(work, "mouth.json"), out_nomusic: ENERGY ? join(work, "mix-nomusic.wav") : undefined };
 writeFileSync(join(work, "timeline.json"), JSON.stringify(mixSpec));
 log(`audio mix (${duration.toFixed(1)} s)`);
 run(PYTHON, [join(HERE, "tts", "mix.py"), join(work, "timeline.json")]);

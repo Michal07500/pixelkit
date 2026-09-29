@@ -5,7 +5,7 @@ export default {
   badge: "ROBLOX DEV TIP #2",
   style: "adhd",
   music: "phonk",
-  musicDb: -23,
+  musicDb: -21,
   speed: 1.18,
   segments: [
     {

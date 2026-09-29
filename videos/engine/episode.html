@@ -165,7 +165,8 @@
   .toast span { display: block; font-size: 30px; color: var(--muted); margin-top: 4px; }
   .toast .tm { font-size: 26px; color: var(--muted); align-self: start; }
   .s-notify .note { margin-top: 26px; font-size: 24px; color: #6b6b80; }
-  body.landscape .toasts { max-width: 1200px; }
+  body.landscape .toasts { max-width: 1200px; width: 100%; margin: 0 auto; }
+  body.landscape .s-notify .note { text-align: center; }
 
   #flash { position: absolute; inset: 0; background: radial-gradient(circle at 50% 45%, rgba(236,255,190,.9), rgba(198,255,61,.35) 55%, transparent 80%); opacity: 0; pointer-events: none; mix-blend-mode: screen; }
   body.energy #captions span.box { background: var(--accent); color: #0b0f00; border-color: var(--accent); box-shadow: 8px 8px 0 var(--deep); }

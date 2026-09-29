@@ -8,7 +8,7 @@ Tento návod ťa prevedie od stiahnutia až po prvú predaj. Predpokladá, že n
 |---|---|
 | `site/` | Web: landing page, `thanks.html` (po zaplatení), `privacy.html`, lekcia zadarmo v `site/free/`, trailer v `site/media/` |
 | `course/modules/` | Celý kurz v textovej podobe (9 modulov, 43 lekcií) |
-| `course/pdf/` | PDF: 9 modulov, lekcia zadarmo a celý kurz v jednom PDF |
+| `course/pdf/` | PDF: 9 modulov, lekcia zadarmo, celý kurz v jednom PDF a 3 bonusy |
 | `videos/out/` | Všetky hotové videá s komentátorom (kurz + reklamy) |
 | `social/` | Instagram: plán na týždeň, popisky, hashtagy, karusely |
 | `assets/brand/` | Logo, profilovka na Instagram, logo pre Roblox intro |
@@ -78,6 +78,15 @@ Vznikne `dist/PIXEL-KIT-Core-Course.zip` (všetky PDF + videá + návod „START
 - `site/privacy.html` → všetko v `[HRANATÝCH ZÁTVORKÁCH]` (meno, kontakt, dátum, poskytovatelia).
 - Na webe sľubujeme **14-dňovú garanciu vrátenia peňazí**, a v balíku All Access **mesačný live Q&A** a **spätnú väzbu na hru**. Buď ich dodržuj, alebo ich z textu webu odstráň.
 
+### 4.1 Prvky, ktoré predávajú (voliteľné, ale odporúčam)
+
+V `site/index.html` v bloku `CONFIG`:
+
+- **`FOUNDING_DEADLINE`**: dátum, kedy skončí cena pre zakladajúcich členov (napr. `"2026-11-01T23:59:00+01:00"`). V úvode webu sa zobrazí živý odpočet. **Nastav len skutočný termín a po ňom naozaj zvýš cenu na $49**, inak je to klamlivá reklama.
+- **`FOUNDER`**: tvoja karta „Who's teaching“. Ľudia kupujú od ľudí. Vyplň meno, fotku (ulož ju do `site/media/founder.jpg`) a 2–3 vety, napr.:
+  > *I'm building PIXEL HEIST, a Roblox heist game, and I made PIXEL KIT to teach exactly what I had to figure out the hard way: from the first part to a published game with a store.*
+- **Recenzie:** keď prví kupujúci dokončia moduly, popros ich o krátku vetu a screenshot ich hry a pridaj ich na web. Nikdy si recenzie nevymýšľaj.
+
 ## 5. Videá: ako ich pustiť a kam nahrať
 
 Všetky videá sú v `videos/out/` ako **MP4 (H.264 + AAC)**. Prehrá ich hocičo: prehliadač, VLC, telefón, Windows aj Mac.
@@ -89,6 +98,7 @@ Všetky videá sú v `videos/out/` ako **MP4 (H.264 + AAC)**. Prehrá ich hocič
 | `ad-trailer-16x9.mp4` | Trailer na web (je v `site/media/`), YouTube, Facebook |
 | `ig-day1-…` až `ig-day7-…` | Instagram Reels na celý týždeň (9:16), s našim phonk beatom |
 | `ig-day…-nomusic.mp4` | Tie isté Reels bez hudby, na pridanie trendového songu priamo v Instagrame |
+| `ig-extra1-30-days`, `ig-extra2-pov-first-game` | Bonusové Reels o vysnenom výsledku (2. týždeň alebo platená reklama) |
 
 **Ako ich dostať na telefón:** stiahni ich z GitHubu (otvor súbor → **Download raw file**) alebo si ich pošli cez Google Drive / AirDrop / WhatsApp sebe.
 
