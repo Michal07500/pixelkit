@@ -1,42 +1,59 @@
 // Instagram week · Day 1 (Mon) · Launch trailer. Also rendered in 16:9 (see day1-trailer-wide.mjs).
+// Arc: you play → someone built it → they got paid → why not you? → the dream → how → free start.
 export default {
   id: "ig-day1-trailer",
   format: "portrait",
   badge: "NEW · ROBLOX COURSE",
   music: "hype",
-  speed: 1.06,
+  musicDb: -17,
+  energy: true,
+  speed: 1.12,
   segments: [
     {
-      scene: { type: "statement", text: "You play *Roblox.*" },
-      say: "You play Roblox.",
+      scene: { type: "statement", text: "You've played *1,000 hours* of Roblox." },
+      say: "You've played a thousand hours of Roblox.",
     },
     {
-      scene: { type: "statement", text: "What if you *built it?*" },
-      say: "What if you built it?",
+      scene: { type: "statement", text: "Someone *built* every one of those games." },
+      say: "Every single one of those games? Someone built it.",
     },
     {
-      scene: { type: "code", file: "LavaFloor / Script", code: `lava.Touched:Connect(function(hit)\n\tlocal hum = hit.Parent\n\t\t:FindFirstChildOfClass("Humanoid")\n\tif hum then\n\t\thum.Health = 0\n\tend\nend)` },
-      say: "PIXEL KIT teaches you Roblox Studio from zero. Real code, explained line by line.",
+      scene: { type: "punch", text: "And got *paid.*" },
+      say: "And got paid!",
     },
     {
-      scene: { type: "checklist", headingBeat: true, heading: "Build a *full game*", items: ["World building", "Luau scripting", "UI & menus", "Saving player data", "In-game store", "Publish & grow"] },
+      scene: { type: "statement", eyebrow: "DEVELOPER EXCHANGE", text: "Roblox pays creators *hundreds of millions* every year.", sub: "Eligible creators cash out Robux for real money." },
+      say: "Roblox pays its creators hundreds of millions of dollars, every single year.",
+    },
+    {
+      scene: { type: "punch", text: "Why not *you?*" },
+      say: "So why not you?",
+    },
+    {
+      scene: {
+        type: "notify",
+        items: [
+          { icon: "LIVE", title: "Your game is live!", sub: "Coin Rush is public", color: "#c6ff3d" },
+          { icon: "+12", title: "12 players online", sub: "playing your game right now", color: "#3de0ff" },
+          { icon: "R$", title: "+R$ 99 · first sale!", sub: "Someone bought 2× Coins", color: "#ffd23d" },
+          { icon: "1K", title: "1,000 visits", sub: "and counting", color: "#ff4fa3" },
+        ],
+        note: "Illustration. What you earn depends on your game.",
+      },
       say: [
-        "Nine modules.",
-        "One complete game,",
-        "from an empty baseplate,",
-        "to menus,",
-        "saved progress,",
-        "an in-game store,",
-        "and a public launch.",
+        "Imagine hitting publish on your own game.",
+        "Watching real players jump in.",
+        "Your first sale.",
+        "Your first thousand visits!",
       ],
     },
     {
-      scene: { type: "grid", heading: "Then pick your *genre*", tiles: [{ label: "Obby", color: "#c6ff3d" }, { label: "Tycoon", color: "#ffd23d" }, { label: "Simulator", color: "#3de0ff" }, { label: "Horror", color: "#ff4fa3" }, { label: "Heist", color: "#c6ff3d" }, { label: "Tower Defense", color: "#ffd23d" }] },
-      say: "Then level up with genre packs: obby, tycoon, simulator, horror, heist and tower defense.",
+      scene: { type: "checklist", headingBeat: true, heading: "From *zero* to *shipped*", items: ["Build the world", "Write real code", "Save player progress", "Add a store that earns"] },
+      say: ["PIXEL KIT takes you from zero to shipped.", "Build the world.", "Write real code.", "Save progress.", "Add a store that earns!"],
     },
     {
-      scene: { type: "cta", title: "Your first lesson is *free.*", sub: "Learn Roblox Studio. Ship real games.", button: "LINK IN BIO" },
-      say: "Your first lesson is free. Link in bio.",
+      scene: { type: "cta", title: "Start *free* today.", sub: "First lesson free · no experience needed", button: "LINK IN BIO" },
+      say: "Your first lesson is free. Link in bio. Let's build!",
     },
   ],
 };

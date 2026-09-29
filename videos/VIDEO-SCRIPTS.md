@@ -1,13 +1,16 @@
 # PIXEL KIT: Video Scripts
 
-Ready-made animated clips live in `out/`:
+All finished videos live in `out/`. The narrated ones are made with `build-episode.mjs` from the scripts in `episodes/` (see the README):
 
-| File | Format | Length | Use |
-|---|---|---|---|
-| `promo-vertical.mp4` | 1080×1920 (9:16) | 19 s | TikTok, Reels, Shorts, pinned post |
-| `lesson-explainers.mp4` | 1920×1080 (16:9) | 42 s | Cut into the free lesson video (see timestamps below) |
+| File | Format | Use |
+|---|---|---|
+| `course-m00-free-lesson-intro-screen.mp4` | 16:9, narrated | The free lesson video (also on the website) |
+| `course-m01-…` to `course-m09-…` | 16:9, narrated | One video per module, for buyers |
+| `ad-trailer-16x9.mp4` | 16:9, narrated | Website, YouTube, Facebook |
+| `ig-day1-…` to `ig-day7-…` | 9:16, narrated | Instagram week (see `social/INSTAGRAM-WEEK.md`) |
+| `promo-vertical.mp4`, `lesson-explainers.mp4` | silent | Older animated clips (sources in `src/`, rendered with `render.mjs`); handy as b-roll |
 
-Both are silent on purpose, so you can add music or a voiceover in CapCut or DaVinci Resolve. Use royalty-free music (CapCut's commercial library, YouTube Audio Library) so the video doesn't get muted or claimed.
+The sections below are for recording your *own* screen-capture tutorials in Roblox Studio to go with them.
 
 ---
 

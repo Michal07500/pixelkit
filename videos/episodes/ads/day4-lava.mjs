@@ -4,11 +4,13 @@ export default {
   format: "portrait",
   badge: "30-SECOND TUTORIAL",
   music: "hype",
-  speed: 1.06,
+  musicDb: -17,
+  energy: true,
+  speed: 1.12,
   segments: [
     {
-      scene: { type: "statement", text: "Make *lava* in Roblox in 8 lines.", sub: "Save this for later." },
-      say: ["Make lava in Roblox in eight lines of code.", "Save this for later."],
+      scene: { type: "punch", text: "*Lava.* 8 lines.", sub: "Save this for later." },
+      say: ["Lava in Roblox. Eight lines of code.", "Save this for later!"],
     },
     {
       scene: {
@@ -17,18 +19,22 @@ export default {
         steps: [[1, 1], [3, 3], [4, 9]], focus: [[1, 1], [3, 3], [4, 9]],
       },
       say: [
-        "Put a script inside your lava part, and grab the part.",
+        "Put a script inside your lava part.",
         "Listen to the Touched event.",
-        "If whatever touched it has a Humanoid, set its health to zero. Done.",
+        "If a Humanoid touched it, health goes to zero. Done!",
       ],
     },
     {
-      scene: { type: "bullets", headingBeat: true, heading: "Make it *pro*", items: ["Neon orange material", "Bloom in Lighting", "Bubbling particles", "A sizzle sound"] },
-      say: ["Want it to look pro?", "Use neon orange.", "Add bloom in lighting.", "Add bubbling particles.", "And a sizzle sound."],
+      scene: { type: "bullets", headingBeat: true, heading: "Make it *epic*", items: ["Neon orange material", "Bloom in Lighting", "Bubbling particles", "A sizzle sound"] },
+      say: ["Now make it epic.", "Neon orange.", "Bloom in lighting.", "Bubbling particles.", "And a sizzle sound!"],
+    },
+    {
+      scene: { type: "punch", text: "That's how *obbies* start.", sub: "Some of the biggest games on Roblox are built on hazards like this." },
+      say: ["That's how obbies start.", "Some of the biggest games on Roblox are built on hazards exactly like this."],
     },
     {
       scene: { type: "cta", title: "Build a *whole game* like this.", sub: "9 modules · 1 shipped game", button: "LINK IN BIO" },
-      say: "Want to build a whole game like this? Link in bio.",
+      say: "Want to build a whole game? First lesson free. Link in bio.",
     },
   ],
 };

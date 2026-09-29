@@ -76,90 +76,117 @@ PROGRESSIONS = {
 
 
 def music_bed(duration, style):
-    bpm = 86 if style == "calm" else 112
+    hype = style == "hype"
+    bpm = 124 if hype else 86
     beat = 60 / bpm
     bar = 4 * beat
     n = int(duration * SR) + SR
-    L = np.zeros(n)
-    R = np.zeros(n)
+    mel_l, mel_r = np.zeros(n), np.zeros(n)     # pads, bass, arps (sidechained in hype)
+    drums = np.zeros(n)
     prog = PROGRESSIONS[style]
     t_bar = np.arange(int(bar * SR)) / SR
+    intro_bars = 1 if hype else 0               # hype: one bar of build before the drop
+
+    def add(buf, s0, wave, gain):
+        if s0 >= n:
+            return
+        ln = min(len(wave), n - s0)
+        buf[s0:s0 + ln] += wave[:ln] * gain
 
     bars = int(np.ceil(duration / bar)) + 1
     for b in range(bars):
         chord = prog[b % len(prog)]
         start = int(b * bar * SR)
-        seg = slice(start, min(start + len(t_bar), n))
-        m = seg.stop - seg.start
+        m = min(len(t_bar), n - start)
         if m <= 0:
             break
         tt = t_bar[:m]
 
-        # Pad: detuned soft saws, lowpassed, wide stereo
-        pad_l = np.zeros(m)
-        pad_r = np.zeros(m)
+        # Pad: detuned soft saws, wide stereo
+        pad_l, pad_r = np.zeros(m), np.zeros(m)
         for note in chord:
             f = midi_hz(note)
             for det, side in ((-0.12, "l"), (0.12, "r")):
                 ph = 2 * np.pi * f * (1 + det / 100) * tt
                 wave = np.sin(ph) + 0.35 * np.sin(2 * ph) + 0.12 * np.sin(3 * ph)
-                if side == "l":
-                    pad_l += wave
-                else:
-                    pad_r += wave
-        env = adsr(m, 0.6, 0.9)
-        L[seg] += pad_l * env * 0.035
-        R[seg] += pad_r * env * 0.035
+                (pad_l if side == "l" else pad_r)[:] += wave
+        env = adsr(m, 0.6 if not hype else 0.15, 0.9 if not hype else 0.3)
+        mel_l[start:start + m] += pad_l * env * (0.035 if not hype else 0.03)
+        mel_r[start:start + m] += pad_r * env * (0.035 if not hype else 0.03)
 
-        # Bass on beats 1 and 3
+        in_drop = b >= intro_bars
         root = chord[0] - 12
-        for k in (0, 2):
-            s0 = start + int(k * beat * SR)
-            ln = int(beat * 1.8 * SR)
-            if s0 >= n:
-                continue
-            ln = min(ln, n - s0)
-            tb = np.arange(ln) / SR
-            wave = np.sin(2 * np.pi * midi_hz(root) * tb) * np.exp(-tb * 2.2) * adsr(ln, 0.01, 0.1)
-            L[s0:s0 + ln] += wave * 0.16
-            R[s0:s0 + ln] += wave * 0.16
+        if hype and in_drop:
+            # Driving 8th-note bass
+            for k in range(8):
+                ln = int(beat / 2 * 0.9 * SR)
+                tb = np.arange(ln) / SR
+                f = midi_hz(root - (12 if k % 2 == 0 else 0))
+                wave = (np.sin(2 * np.pi * f * tb) + 0.3 * np.sin(4 * np.pi * f * tb)) * adsr(ln, 0.005, 0.05)
+                w2 = wave
+                add(mel_l, start + int(k * beat / 2 * SR), w2, 0.2)
+                add(mel_r, start + int(k * beat / 2 * SR), w2, 0.2)
+        elif not hype:
+            for k in (0, 2):
+                ln = int(beat * 1.8 * SR)
+                tb = np.arange(ln) / SR
+                wave = np.sin(2 * np.pi * midi_hz(root) * tb) * np.exp(-tb * 2.2) * adsr(ln, 0.01, 0.1)
+                add(mel_l, start + int(k * beat * SR), wave, 0.16)
+                add(mel_r, start + int(k * beat * SR), wave, 0.16)
 
-        # Pluck arpeggio in 8th notes, ping-pong panned
+        # Pluck arpeggio (16ths in hype, 8ths in calm), ping-pong panned
         arp = sorted(chord)[1:] + [chord[0] + 12]
-        for k in range(8):
-            s0 = start + int(k * beat / 2 * SR)
-            ln = int(0.5 * SR)
-            if s0 >= n:
-                continue
-            ln = min(ln, n - s0)
+        steps, div = (16, 4) if hype else (8, 2)
+        for k in range(steps):
+            ln = int(0.4 * SR)
             tp = np.arange(ln) / SR
             f = midi_hz(arp[k % len(arp)] + 12)
-            wave = (np.sin(2 * np.pi * f * tp) + 0.25 * np.sin(4 * np.pi * f * tp)) * np.exp(-tp * 9)
+            wave = (np.sin(2 * np.pi * f * tp) + 0.25 * np.sin(4 * np.pi * f * tp)) * np.exp(-tp * (14 if hype else 9))
             pan = 0.35 if k % 2 == 0 else 0.65
-            L[s0:s0 + ln] += wave * 0.05 * (1 - pan) * 2
-            R[s0:s0 + ln] += wave * 0.05 * pan * 2
+            g = 0.045 if hype else 0.05
+            add(mel_l, start + int(k * beat / div * SR), wave, g * (1 - pan) * 2)
+            add(mel_r, start + int(k * beat / div * SR), wave, g * pan * 2)
 
-        if style == "hype":
+        if hype and in_drop:
             for k in range(4):
-                # Kick
-                s0 = start + int(k * beat * SR)
-                ln = min(int(0.28 * SR), n - s0)
-                if ln > 0:
-                    tk = np.arange(ln) / SR
-                    freq = 45 + 75 * np.exp(-tk * 28)
-                    kick = np.sin(2 * np.pi * np.cumsum(freq) / SR) * np.exp(-tk * 11)
-                    L[s0:s0 + ln] += kick * 0.22
-                    R[s0:s0 + ln] += kick * 0.22
-                # Hat on the off-beat
-                s1 = start + int((k + 0.5) * beat * SR)
-                ln = min(int(0.05 * SR), n - s1)
-                if ln > 0:
+                # Four-on-the-floor kick
+                ln = int(0.3 * SR)
+                tk = np.arange(ln) / SR
+                freq = 42 + 90 * np.exp(-tk * 30)
+                kick = np.sin(2 * np.pi * np.cumsum(freq) / SR) * np.exp(-tk * 9)
+                kick += np.sin(2 * np.pi * 3000 * tk) * np.exp(-tk * 400) * 0.3   # click
+                add(drums, start + int(k * beat * SR), kick, 0.42)
+                # Clap on 2 and 4
+                if k in (1, 3):
+                    ln = int(0.2 * SR)
+                    tc = np.arange(ln) / SR
+                    noise = rng.standard_normal(ln)
+                    band = np.diff(np.concatenate([[0], smooth(noise, 2500)]))
+                    env = np.exp(-tc * 28) + 0.6 * np.exp(-np.maximum(tc - 0.012, 0) * 30) * (tc > 0.012)
+                    add(drums, start + int(k * beat * SR), band * env * 6, 0.09)
+                # Hats: open-ish on the off-beat, closed 16ths
+                for j, g in ((0.5, 0.05), (0.25, 0.018), (0.75, 0.018)):
+                    ln = int((0.09 if j == 0.5 else 0.035) * SR)
                     th = np.arange(ln) / SR
-                    hat = np.diff(rng.standard_normal(ln + 1)) * np.exp(-th * 90)
-                    L[s1:s1 + ln] += hat * 0.02
-                    R[s1:s1 + ln] += hat * 0.025
+                    hat = np.diff(rng.standard_normal(ln + 1)) * np.exp(-th * (45 if j == 0.5 else 110))
+                    add(drums, start + int((k + j) * beat * SR), hat, g)
 
-    return L[: int(duration * SR)], R[: int(duration * SR)]
+    L = mel_l[: int(duration * SR)]
+    R = mel_r[: int(duration * SR)]
+    D = drums[: int(duration * SR)]
+    if hype:
+        # Sidechain pump: melodic parts duck after every kick
+        t_all = np.arange(len(L)) / SR
+        pump = 1 - 0.55 * np.exp(-np.mod(t_all, beat) * 9)
+        pump[: int(intro_bars * bar * SR)] = 1
+        L, R = L * pump, R * pump
+        # Filter-sweep the intro bar so the drop hits harder
+        ib = int(intro_bars * bar * SR)
+        if ib:
+            sweep = np.linspace(0.25, 1, ib) ** 2
+            L[:ib] *= sweep
+            R[:ib] *= sweep
+    return L + D, R + D
 
 
 # ---------------------------------------------------------------- sound effects
@@ -178,6 +205,14 @@ def sfx(kind):
             y[i] = acc
         env = np.sin(np.pi * t / t[-1]) ** 1.5
         return y * env * 0.5
+    if kind == "ding":
+        ln = int(0.5 * SR)
+        t = np.arange(ln) / SR
+        a = np.sin(2 * np.pi * 1318.5 * t) * np.exp(-t * 9)
+        b = np.zeros(ln)
+        o = int(0.09 * SR)
+        b[o:] = np.sin(2 * np.pi * 1975.5 * t[: ln - o]) * np.exp(-t[: ln - o] * 7)
+        return (a + b) * 0.16
     if kind == "tick":
         ln = int(0.07 * SR)
         t = np.arange(ln) / SR

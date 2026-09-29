@@ -4,28 +4,38 @@ export default {
   format: "portrait",
   badge: "ROBLOX DEV TIP #1",
   music: "hype",
-  speed: 1.06,
+  musicDb: -17,
+  energy: true,
+  speed: 1.12,
   segments: [
     {
-      scene: { type: "statement", text: "Your Roblox UI is *broken* on phones.", sub: "Here's the one-line fix." },
-      say: ["Your Roblox UI is probably broken on phones.", "Here's the one line fix."],
+      scene: { type: "statement", text: "Over *half* your players are on phones." },
+      say: "Over half of your players are on phones.",
+    },
+    {
+      scene: { type: "punch", text: "*5 seconds.*", sub: "That's how long they give a broken UI." },
+      say: ["Five seconds.", "That's how long they give a broken UI before they leave. Forever."],
     },
     {
       scene: { type: "compare",
-        bad: { tag: "✕ OFFSET", title: "Pixels", code: `UDim2.new(0, 300, 0, 60)` },
-        good: { tag: "✓ SCALE", title: "Percent of screen", code: `UDim2.new(0.2, 0, 0.08, 0)` } },
+        bad: { tag: "✕ OFFSET", title: "Pixels", code: `UDim2.new(0, 300, 0, 60)\n-- huge on phones` },
+        good: { tag: "✓ SCALE", title: "Percent of screen", code: `UDim2.new(0.2, 0, 0.08, 0)\n-- right on every screen` } },
       say: [
-        "Offset sizes are in pixels. Three hundred pixels is huge on a phone and tiny on a big monitor.",
-        "Scale sizes are a percent of the screen, so it looks right on every device.",
+        "The usual culprit? Offset. Pixel sizes look fine on your monitor, and completely broken on a phone.",
+        "Use scale instead. It's a percent of the screen, so it looks right everywhere.",
       ],
     },
     {
-      scene: { type: "bullets", headingBeat: true, heading: "Pro *checklist*", items: ["Size with Scale", "Lock shapes: UIAspectRatio", "Center with AnchorPoint 0.5", "Test in the device emulator"] },
-      say: ["The pro checklist.", "Size with scale.", "Lock shapes with an aspect ratio constraint.", "Center things with an anchor point of point five.", "And test in the device emulator."],
+      scene: { type: "bullets", headingBeat: true, heading: "The pro *checklist*", items: ["Size with Scale", "Lock shapes: UIAspectRatio", "Center: AnchorPoint 0.5", "Test in the device emulator"] },
+      say: ["The pro checklist!", "Size with scale.", "Lock shapes with an aspect ratio constraint.", "Center with anchor point point five.", "And always test in the device emulator."],
     },
     {
-      scene: { type: "cta", title: "Learn Roblox Studio *properly.*", sub: "First lesson free", button: "LINK IN BIO" },
-      say: "Follow for a Roblox dev tip every day. First lesson free, link in bio.",
+      scene: { type: "punch", text: "More players. *More Robux.*" },
+      say: "Players who stay are players who pay.",
+    },
+    {
+      scene: { type: "cta", title: "Build games that *keep players.*", sub: "First lesson free", button: "LINK IN BIO" },
+      say: "Save this, and grab the free lesson. Link in bio.",
     },
   ],
 };

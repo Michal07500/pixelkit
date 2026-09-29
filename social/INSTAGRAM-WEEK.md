@@ -1,6 +1,6 @@
 # PIXEL KIT · Instagram launch week
 
-Seven days of ready-to-post content. Every Reel has a narrator, burned-in captions (most people watch muted), music and sound effects. Files are in `videos/out/` and `social/carousels/`.
+Seven days of ready-to-post content. Every Reel is built on an emotional hook, has a high-energy narrator, burned-in captions (most people watch muted), music and sound effects. Files are in `videos/out/` and `social/carousels/`.
 
 **Before day 1**
 - Profile name: `PIXEL KIT | Roblox Studio course`
@@ -17,15 +17,15 @@ Seven days of ready-to-post content. Every Reel has a narrator, burned-in captio
 
 | Day | Format | File | Hook |
 |---|---|---|---|
-| Mon | Reel | `videos/out/ig-day1-trailer.mp4` | You play Roblox. What if you built it? |
-| Tue | Reel | `videos/out/ig-day2-mobile-ui.mp4` | Your Roblox UI is broken on phones |
+| Mon | Reel | `videos/out/ig-day1-trailer.mp4` | You've played 1,000 hours of Roblox. Someone built those games, and got paid. |
+| Tue | Reel | `videos/out/ig-day2-mobile-ui.mp4` | Over half your players are on phones. 5 seconds. |
 | Tue | Carousel | `social/carousels/studio-shortcuts/` (9 slides) | 7 shortcuts that make you 2× faster |
-| Wed | Reel | `videos/out/ig-day3-never-trust-client.mp4` | One line gave a hacker 999,999 coins |
-| Thu | Reel | `videos/out/ig-day4-lava.mp4` | Lava in 8 lines of code |
-| Fri | Reel | `videos/out/ig-day5-robux.mp4` | How do Roblox games earn Robux? |
+| Wed | Reel | `videos/out/ig-day3-never-trust-client.mp4` | Your game finally takes off. Then this happens. |
+| Thu | Reel | `videos/out/ig-day4-lava.mp4` | Lava. 8 lines. |
+| Fri | Reel | `videos/out/ig-day5-robux.mp4` | Roblox pays creators hundreds of millions a year. But how? |
 | Fri | Carousel | `social/carousels/first-game-roadmap/` (5 slides) | Your first Roblox game in 9 steps |
-| Sat | Reel | `videos/out/ig-day6-inside.mp4` | What's inside PIXEL KIT |
-| Sun | Reel | `videos/out/ig-day7-free-lesson.mp4` | Big games start with a logo intro |
+| Sat | Reel | `videos/out/ig-day6-inside.mp4` | Imagine sending your friends a link to YOUR game |
+| Sun | Reel | `videos/out/ig-day7-free-lesson.mp4` | Every big game opens with a logo intro. Yours can too. |
 
 **Stories every day** (5 minutes of work): repost the day's Reel to your Story with a poll sticker ("Would you play Coin Rush? Yes / Yes!!"), or a question sticker ("What game would you build?"). Stories build the relationship; Reels bring new people.
 
@@ -37,13 +37,16 @@ Copy and paste. Put the hashtags in the caption or the first comment.
 
 ### Mon · Trailer
 ```
-You play Roblox. What if you built it? 🎮
+You've played 1,000 hours of Roblox. 🎮
+Someone built every one of those games. And got paid. 💸
 
-PIXEL KIT teaches Roblox Studio from zero: 9 modules, 43 lessons, and one complete game you actually publish.
+Roblox pays its creators hundreds of millions of dollars every year. So why not you?
 
-The first lesson is free 👉 link in bio
+PIXEL KIT takes you from zero to a published game with a store, in 9 modules. No experience needed.
 
-#roblox #robloxstudio #robloxdev #gamedev #indiedev #learntocode #luau #coding
+🎁 First lesson free 👉 link in bio
+
+#roblox #robloxstudio #robloxdev #gamedev #indiedev #learntocode #robux #sidehustle
 ```
 
 ### Tue · Mobile UI tip (Reel)
@@ -71,13 +74,14 @@ Save it, you'll need it 💾
 
 ### Wed · Never trust the client
 ```
-One line of server code gave a hacker 999,999 coins 💀
+Your game finally takes off. Hundreds of players. Your first sales. 🚀
+Then ONE exploiter gives himself 999,999 coins and wrecks your economy overnight. 💀
 
-The golden rule of Roblox: never trust the client. Players send what they WANT to do; the server checks the rules and decides.
+The fix is the golden rule of Roblox: never trust the client. The player asks, the server decides.
 
-We teach secure client–server code in Module 05 of PIXEL KIT. Link in bio.
+Protect what you build. Module 05 of PIXEL KIT, link in bio.
 
-#robloxdev #robloxstudio #exploits #gamedev #cybersecurity #roblox #coding
+#robloxdev #robloxstudio #exploits #gamedev #roblox #coding #cybersecurity
 ```
 
 ### Thu · Lava in 8 lines
@@ -93,14 +97,16 @@ Want to build a whole game like this? Link in bio.
 
 ### Fri · How Roblox games earn (Reel)
 ```
-How do Roblox games actually earn Robux? 💸
+Roblox pays its creators hundreds of millions of dollars a year. 💸 But how does a game actually earn?
 
-🎟️ Game Passes: buy once (2× coins, VIP)
-🛒 Developer Products: buy again (coin packs, revives)
+🎟️ Game Passes: bought once (2× coins, VIP)
+🛒 Developer Products: bought again and again (coin packs, revives)
 
-And players only pay when the free game is already fun. Never pay-to-win.
+The secret: players pay when the free game is already fun. Never pay-to-win.
 
-#robloxdev #robux #gamedev #monetization #robloxstudio #roblox
+What you earn depends on your game, and we teach you to build one that can. Link in bio.
+
+#robloxdev #robux #gamedev #monetization #robloxstudio #roblox #devex
 ```
 
 ### Fri · Roadmap (Carousel)
@@ -112,15 +118,15 @@ Your first Roblox game in 9 steps 🗺️ Where are you right now? Comment your 
 
 ### Sat · What's inside
 ```
-Inside PIXEL KIT 👀
+Imagine sending your friends a link to YOUR game. Not one you play. One you made. 🥹
 
 📦 9 modules · 43 lessons
 🎬 A narrated video for every module
 📄 PDF workbooks with all the code
-🎮 1 game you actually ship
+🎮 1 game you actually ship (with a store)
 🧩 Genre packs: obby, tycoon, simulator, horror, heist, tower defense
 
-Pay once, keep forever. 14-day money-back guarantee. Link in bio.
+Pay once, keep forever. 14-day money-back guarantee. Your game starts today, link in bio.
 
 #robloxstudio #roblox #onlinecourse #gamedev #learntocode #robloxdev
 ```

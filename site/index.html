@@ -230,6 +230,11 @@
   .video-frame { border: 1px solid var(--line-2); background: #000; box-shadow: 10px 10px 0 var(--line); aspect-ratio: 16 / 9; }
   .video-frame video { width: 100%; height: 100%; display: block; }
   .form-msg a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 3px; }
+  .inside-grid { display: grid; grid-template-columns: 2.2fr 1fr 1fr; gap: 16px; margin-top: 48px; align-items: start; }
+  .shot { margin: 0; background: var(--card); border: 1px solid var(--line); padding: 10px; }
+  .shot img { width: 100%; height: auto; display: block; }
+  .shot figcaption { font-size: 14px; color: var(--muted); padding: 10px 4px 2px; }
+  @media (max-width: 980px) { .inside-grid { grid-template-columns: 1fr 1fr; } .shot.wide { grid-column: 1 / -1; } }
   footer { padding: 48px 0; color: var(--muted); font-size: 14px; }
   footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; }
   footer p { margin: 0; max-width: 640px; }
@@ -303,7 +308,7 @@ screenGui:<span class="f">Destroy</span>()</pre>
 <section id="trailer" class="trailer">
   <div class="wrap">
     <div class="eyebrow">Watch</div>
-    <h2>30 seconds. That's the whole pitch.</h2>
+    <h2>Your game could be next.</h2>
     <div class="video-frame">
       <video src="media/trailer.mp4" poster="media/trailer-poster.jpg" controls playsinline preload="none"></video>
     </div>
@@ -365,6 +370,19 @@ screenGui:<span class="f">Destroy</span>()</pre>
         <p>Black screen, your logo, a smooth fade and scale pop, then straight into gameplay. The same polish big games have, in about 10 minutes. Sent to your inbox the moment you join.</p>
       </div>
       <a href="#join" class="btn btn-primary">Send it to me</a>
+    </div>
+  </div>
+</section>
+
+<section id="inside">
+  <div class="wrap">
+    <div class="eyebrow">Look inside</div>
+    <h2>Videos you'll finish. PDFs you'll use.</h2>
+    <p class="lead">Every module comes with a narrated video where code appears exactly when it's explained, and a PDF workbook with every line of code and exercises to try.</p>
+    <div class="inside-grid">
+      <figure class="shot wide"><img src="media/look-video.jpg" alt="Module 3 video: the lava floor script typing out with captions and the Pix mascot" loading="lazy"><figcaption>Narrated module videos with captions</figcaption></figure>
+      <figure class="shot"><img src="media/look-pdf-cover.jpg" alt="Module 3 PDF cover listing its six lessons" loading="lazy"><figcaption>A PDF workbook per module</figcaption></figure>
+      <figure class="shot"><img src="media/look-pdf-page.jpg" alt="A PDF page with highlighted Luau code and a tip box" loading="lazy"><figcaption>Every line of code, highlighted</figcaption></figure>
     </div>
   </div>
 </section>

@@ -145,6 +145,29 @@
   .stat b { display: block; font-size: 120px; letter-spacing: -0.05em; color: var(--accent); line-height: 1; }
   .stat span { display: block; font-size: 32px; color: var(--muted); margin-top: 12px; }
 
+  /* punch: giant slam text */
+  .s-punch { align-items: center; text-align: center; }
+  .s-punch h1 { text-transform: uppercase; letter-spacing: -0.045em; line-height: .92; }
+  .s-punch .sub { margin-top: 34px; font-size: 42px; color: var(--muted); font-weight: 500; }
+
+  /* notify: phone-style notifications */
+  .s-notify h2 { font-size: 74px; margin-bottom: 40px; }
+  .toasts { display: grid; gap: 22px; }
+  .toast { display: grid; grid-template-columns: 92px 1fr auto; gap: 24px; align-items: center; padding: 24px 28px; background: rgba(28,28,38,.94); border: 2px solid var(--line2); border-radius: 30px; box-shadow: 0 18px 40px rgba(0,0,0,.5); }
+  .toast.active { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(198,255,61,.18), 0 18px 40px rgba(0,0,0,.5); }
+  .toast .ti { width: 92px; height: 92px; border-radius: 22px; display: grid; place-items: center; font: 700 30px Silkscreen, monospace; color: #0b0f00; }
+  .toast b { display: block; font-size: 40px; letter-spacing: -0.02em; line-height: 1.1; }
+  .toast span { display: block; font-size: 30px; color: var(--muted); margin-top: 4px; }
+  .toast .tm { font-size: 26px; color: var(--muted); align-self: start; }
+  .s-notify .note { margin-top: 26px; font-size: 24px; color: #6b6b80; }
+  body.landscape .toasts { max-width: 1200px; }
+
+  #flash { position: absolute; inset: 0; background: radial-gradient(circle at 50% 45%, rgba(236,255,190,.9), rgba(198,255,61,.35) 55%, transparent 80%); opacity: 0; pointer-events: none; mix-blend-mode: screen; }
+  body.energy #captions span.box { background: var(--accent); color: #0b0f00; border-color: var(--accent); box-shadow: 8px 8px 0 var(--deep); }
+  body.energy #captions .w { opacity: .45; }
+  body.energy #captions .w.now { color: #000; opacity: 1; display: inline-block; transform: scale(1.12); }
+  body.energy.portrait #captions { font-size: 54px; }
+
   /* cta */
   .s-cta { align-items: center; text-align: center; }
   .s-cta .logo { width: 170px; height: 170px; margin-bottom: 44px; }
@@ -162,6 +185,7 @@
 <div id="stage"></div>
 <div id="captions"></div>
 <div id="pix"></div>
+<div id="flash"></div>
 <div id="progress"></div>
 
 <script>
@@ -174,7 +198,7 @@ const inOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
 const back = (x) => { const c1 = 1.7, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const PORTRAIT = EP.format === "portrait";
-document.body.className = PORTRAIT ? "portrait" : "landscape";
+document.body.className = (PORTRAIT ? "portrait" : "landscape") + (EP.energy ? " energy" : "");
 const W = PORTRAIT ? 1080 : 1920, H = PORTRAIT ? 1920 : 1080;
 
 // Deterministic pseudo-random
@@ -250,13 +274,13 @@ const SCENES = EP.segments.map((seg, i) => {
         <div class="list">${sc.items.map((it) => `<div class="row"><span class="box"><b></b></span><span>${esc(it)}</span></div>`).join("")}</div>`;
       break;
     case "code": {
-      const lines = sc.code.replace(/\t/g, "    ").split("\n");
+      const lines = sc.code.replace(/\t/g, PORTRAIT ? "  " : "    ").split("\n");
       sc._lines = lines.map(tokenize);
       sc._len = lines.map((l) => l.length);
       const maxLen = Math.max(...sc._len, 20);
       const stageW = PORTRAIT ? 890 : 1620, stageH = PORTRAIT ? 820 : 660;
       const avail = stageH - (sc.eyebrow ? 58 : 0) - 125;
-      const fs = Math.floor(Math.min(PORTRAIT ? 34 : 40, (stageW - 90) / (maxLen * 0.61), avail / (lines.length * 1.55)));
+      const fs = Math.floor(Math.min(PORTRAIT ? 44 : 40, (stageW - 90) / (maxLen * 0.61), avail / (lines.length * 1.55)));
       html = `${sc.eyebrow ? `<div class="eyebrow caption-top">${esc(sc.eyebrow)}</div>` : ""}
         <div class="win"><div class="win-bar"><i style="background:var(--pink)"></i><i style="background:var(--yellow)"></i><i style="background:var(--accent)"></i><span style="margin-left:8px">${esc(sc.file || "Script")}</span></div>
         <pre style="font-size:${fs}px;line-height:1.55;min-width:${Math.min(stageW - 40, maxLen * fs * 0.61 + 70)}px">${lines.map(() => `<span class="ln"></span>`).join("")}</pre></div>`;
@@ -283,6 +307,15 @@ const SCENES = EP.segments.map((seg, i) => {
       break;
     case "stats":
       html = `${sc.heading ? `<h2>${words(sc.heading)}</h2>` : ""}<div class="stats" style="--cols:${sc.items.length}">${sc.items.map((s) => `<div class="stat"><b data-v="${esc(s.value)}">0</b><span>${esc(s.label)}</span></div>`).join("")}</div>`;
+      break;
+    case "punch": {
+      const len = sc.text.replace(/\*/g, "").length;
+      const size = PORTRAIT ? (len < 10 ? 210 : len < 18 ? 170 : 128) : (len < 12 ? 230 : len < 22 ? 180 : 140);
+      html = `<h1 style="font-size:${size}px">${words(sc.text)}</h1>${sc.sub ? `<div class="sub">${esc(sc.sub)}</div>` : ""}`;
+      break;
+    }
+    case "notify":
+      html = `${sc.heading ? `<h2>${words(sc.heading)}</h2>` : ""}<div class="toasts">${sc.items.map((it) => `<div class="toast"><div class="ti" style="background:${it.color || "var(--accent)"}">${esc(it.icon || "!")}</div><div><b>${esc(it.title)}</b>${it.sub ? `<span>${esc(it.sub)}</span>` : ""}</div><div class="tm">${esc(it.time || "now")}</div></div>`).join("")}</div>${sc.note ? `<div class="note">${esc(sc.note)}</div>` : ""}`;
       break;
     case "cta":
       html = `<div class="logo">${LOGO_SVG}</div><h1>${words(sc.title)}</h1>${sc.sub ? `<div class="sub">${esc(sc.sub)}</div>` : ""}${sc.button ? `<div class="btn">${esc(sc.button)}</div>` : ""}`;
@@ -434,6 +467,31 @@ function animate(seg, el, t) {
       });
       break;
     }
+    case "punch": {
+      el.querySelectorAll("h1 .word").forEach((w, i) => {
+        const k = p(lt, 0.02 + i * 0.11, 0.24);
+        const sc2 = 1 + 0.7 * Math.pow(1 - out3(k), 2);
+        w.style.opacity = clamp(k * 2.5);
+        w.style.transform = `scale(${sc2})`;
+      });
+      el.querySelectorAll(".em").forEach((w) => { w.style.textShadow = `0 0 60px rgba(198,255,61,.55)`; });
+      const sub = el.querySelector(".sub"); if (sub) rise(sub, out3(p(lt, beats.length > 1 ? beatAt(1) : 0.7, 0.4)));
+      break;
+    }
+    case "notify": {
+      const h = el.querySelector("h2"); if (h) rise(h, out3(p(lt, 0.02, 0.35)));
+      const toasts = [...el.querySelectorAll(".toast")];
+      const off = sc.headingBeat ? 1 : 0;
+      toasts.forEach((tt, k) => {
+        const at = beatAt(k + off);
+        const kk = back(p(lt, at, 0.42));
+        tt.style.opacity = clamp(kk * 2);
+        tt.style.transform = `translateY(${(1 - kk) * -90}px) scale(${0.85 + 0.15 * kk})`;
+        tt.classList.toggle("active", lt >= at && (k + 1 >= toasts.length || lt < beatAt(k + 1 + off)));
+      });
+      const note = el.querySelector(".note"); if (note) note.style.opacity = out3(p(lt, 0.8, 0.5));
+      break;
+    }
     case "cta": {
       const lg = el.querySelector(".logo"); const kl = back(p(lt, 0.05, 0.5)); lg.style.transform = `scale(${kl})`;
       el.querySelectorAll("h1 .word").forEach((w, i) => { const k = back(p(lt, 0.3 + i * 0.08, 0.45)); w.style.opacity = clamp(k); w.style.transform = `translateY(${(1 - k) * 60}px)`; });
@@ -452,16 +510,33 @@ window.renderFrame = function (t) {
   PARTS.forEach((q, i) => { const y = (q.y - t * q.sp) % H; partEls[i].style.transform = `translate(${q.x + Math.sin(t * 0.6 + q.ph) * 30}px, ${y < 0 ? y + H : y}px)`; partEls[i].style.opacity = 0.25 + 0.2 * Math.sin(t * 1.3 + q.ph); });
   $("progress").style.width = (t / EP.duration) * 100 + "%";
 
+  // Impacts: screen shake and flash
+  let shakeX = 0, shakeY = 0, flash = 0;
+  for (const h of EP.hits || []) {
+    const dt = t - h;
+    if (dt < 0 || dt > 0.6) continue;
+    const amp = 18 * Math.exp(-dt * 9);
+    shakeX += Math.sin(dt * 95) * amp; shakeY += Math.cos(dt * 77) * amp * 0.7;
+    flash = Math.max(flash, 0.55 * Math.exp(-dt * 9));
+  }
+  $("flash").style.opacity = flash;
+
   // Scenes: crossfade between segments
   EP.segments.forEach((seg, i) => {
     const el = SCENES[i];
     const last = i === EP.segments.length - 1;
-    const vis = Math.min(p(t, seg.start, 0.35), last ? 1 : 1 - p(t, seg.end - 0.28, 0.28));
+    const fin = EP.energy ? 0.14 : 0.35, fout = EP.energy ? 0.14 : 0.28;
+    const vis = Math.min(p(t, seg.start, fin), last ? 1 : 1 - p(t, seg.end - fout, fout));
     if (vis <= 0) { if (el.style.opacity !== "0") el.style.opacity = 0; return; }
     el.style.opacity = vis;
-    const drift = 1 + 0.025 * clamp((t - seg.start) / Math.max(1, seg.end - seg.start));
-    const enterShift = (1 - out3(p(t, seg.start, 0.45))) * 40;
-    el.style.transform = `translateX(${enterShift}px) scale(${drift})`;
+    const drift = 1 + (EP.energy ? 0.05 : 0.025) * clamp((t - seg.start) / Math.max(1, seg.end - seg.start));
+    if (EP.energy) {
+      const punch = 1 + 0.16 * (1 - out3(p(t, seg.start, 0.32)));
+      el.style.transform = `translate(${shakeX}px, ${shakeY}px) scale(${drift * punch})`;
+    } else {
+      const enterShift = (1 - out3(p(t, seg.start, 0.45))) * 40;
+      el.style.transform = `translateX(${enterShift}px) scale(${drift})`;
+    }
     animate(seg, el, t);
   });
 

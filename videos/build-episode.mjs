@@ -53,14 +53,16 @@ log(`narration: ${jobs.length} lines`);
 const voiceInfo = JSON.parse(run(PYTHON, [join(HERE, "tts", "tts.py"), join(work, "jobs.json"), join(HERE, ".work", "_voice")], { stdio: ["ignore", "pipe", "inherit"] }));
 
 // ---------------------------------------------------------------- 2. timeline
-const LEAD = { title: 1.3, cta: 0.9 };
-const GAP = 0.32;
+const ENERGY = !!ep.energy;
+const LEAD = ENERGY ? { title: 0.9, cta: 0.6, punch: 0.22 } : { title: 1.3, cta: 0.9 };
+const GAP = ENERGY ? 0.16 : 0.32;
+const hits = [];
 let cursor = 0.4;
 const clips = [];
 const events = [];
 const segments = segs.map((s, i) => {
   const start = cursor;
-  let tBeat = start + (LEAD[s.scene.type] ?? 0.55);
+  let tBeat = start + (LEAD[s.scene.type] ?? (ENERGY ? 0.32 : 0.55));
   const beats = s.beats.map((text, k) => {
     const v = voiceInfo[`s${i}_b${k}`];
     const b = { start: tBeat, end: tBeat + v.duration, text: spoken(text) };
@@ -70,15 +72,17 @@ const segments = segs.map((s, i) => {
   });
   const lastEnd = beats.length ? beats[beats.length - 1].end : start + 2;
   const isLast = i === segs.length - 1;
-  const end = lastEnd + (s.hold || 0) + (isLast ? 2.6 : 0.6);
+  const end = lastEnd + (s.hold || 0) + (isLast ? 2.6 : ENERGY ? 0.3 : 0.6);
   cursor = end;
 
   // Sound design
   const type = s.scene.type;
-  if (type === "title" || type === "cta") {
-    if (i > 0) events.push({ t: Math.max(0, start - 0.9), kind: "riser", gain: 0.8 });
-    events.push({ t: start + 0.05, kind: "impact", gain: type === "title" ? 1 : 0.8 });
-  } else events.push({ t: Math.max(0, start - 0.12), kind: "whoosh", gain: 0.55 });
+  if (type === "title" || type === "cta" || type === "punch") {
+    if (i > 0 && type !== "punch") events.push({ t: Math.max(0, start - 0.9), kind: "riser", gain: 0.8 });
+    events.push({ t: start + 0.03, kind: "impact", gain: type === "punch" ? 1 : type === "title" ? 1 : 0.8 });
+    if (ENERGY) hits.push(start + 0.03);
+  } else events.push({ t: Math.max(0, start - 0.12), kind: "whoosh", gain: ENERGY ? 0.7 : 0.55 });
+  if (type === "notify") beats.forEach((b, k) => { if (k >= (s.scene.headingBeat ? 1 : 0)) events.push({ t: b.start, kind: "ding", gain: 0.9 }); });
   const perBeat = { bullets: "pop", flow: "pop", stats: "pop", checklist: "tick" }[type];
   if (perBeat) beats.forEach((b, k) => { if (k > 0 || type === "checklist") events.push({ t: b.start, kind: perBeat, gain: 0.8 }); });
   if (type === "compare" && beats[1]) events.push({ t: beats[1].start, kind: "pop" });
@@ -123,7 +127,7 @@ log(`audio mix (${duration.toFixed(1)} s)`);
 run(PYTHON, [join(HERE, "tts", "mix.py"), join(work, "timeline.json")]);
 const mouth = JSON.parse(readFileSync(join(work, "mouth.json"), "utf8"));
 
-const EPISODE = { format, badge: ep.badge || "", segments, captions, mouth, fps: FPS, duration };
+const EPISODE = { format, badge: ep.badge || "", energy: ENERGY, hits, segments, captions, mouth, fps: FPS, duration };
 writeFileSync(join(work, "episode.json"), JSON.stringify(EPISODE));
 
 // ---------------------------------------------------------------- 4. render
