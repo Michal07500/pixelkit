@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>You're in – PIXEL KIT</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Crect width='8' height='8' fill='%23000'/%3E%3Cpath fill='%23c6ff3d' d='M1 1h4v1H1zM1 2h1v5H1zM4 2h1v2H4zM2 3h2v1H2zM6 1h1v6H6z'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Space+Grotesk:wght@600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#07070a; --card:#121218; --line:#23232e; --line2:#30303d; --text:#f5f5f7; --muted:#9b9bad; --accent:#c6ff3d; --deep:#6f9a00; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--text); font: 17px/1.6 Inter, system-ui, sans-serif; display: grid; place-items: center; padding: 48px 16px;
+    background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 40px 40px; }
+  main { max-width: 640px; width: 100%; background: rgba(12,12,16,.94); border: 1px solid var(--line2); padding: 40px 32px; box-shadow: 10px 10px 0 var(--line); }
+  .logo { display: flex; align-items: center; gap: 10px; font: 700 18px Silkscreen, monospace; margin-bottom: 36px; text-decoration: none; color: inherit; }
+  .logo svg { width: 26px; height: 26px; }
+  .badge { font: 400 12px Silkscreen, monospace; background: var(--accent); color: #0b0f00; padding: 4px 8px; display: inline-block; margin-bottom: 16px; }
+  h1 { font: 700 clamp(34px, 7vw, 48px)/1.05 "Space Grotesk", sans-serif; letter-spacing: -0.03em; margin: 0 0 16px; }
+  h1 span { color: var(--accent); }
+  p { color: #c8c8d4; margin: 0 0 12px; }
+  ol { padding: 0; margin: 28px 0; list-style: none; display: grid; gap: 12px; counter-reset: step; }
+  li { counter-increment: step; display: grid; grid-template-columns: 40px 1fr; gap: 14px; padding: 16px; background: var(--card); border: 1px solid var(--line); }
+  li::before { content: "0" counter(step); font: 400 15px Silkscreen, monospace; color: var(--accent); padding-top: 2px; }
+  li b { display: block; font-family: "Space Grotesk", sans-serif; }
+  li span { color: var(--muted); font-size: 15px; }
+  a { color: var(--accent); }
+  .btn { display: inline-block; margin-top: 8px; font: 600 16px "Space Grotesk", sans-serif; background: var(--accent); color: #0b0f00; text-decoration: none; padding: 14px 22px; box-shadow: 4px 4px 0 var(--deep); }
+  .small { font-size: 14px; color: var(--muted); margin-top: 24px; }
+</style>
+</head>
+<body>
+<main>
+  <a class="logo" href="index.html"><svg viewBox="0 0 8 8" shape-rendering="crispEdges"><rect width="8" height="8" fill="#000"/><path fill="#c6ff3d" d="M1 1h4v1H1zM1 2h1v5H1zM4 2h1v2H4zM2 3h2v1H2zM6 1h1v6H6z"/></svg>PIXEL KIT</a>
+  <span class="badge">PAYMENT SUCCESSFUL</span>
+  <h1>You're in. <span>Let's build.</span></h1>
+  <p>Thanks for joining PIXEL KIT. Your receipt and download links are on their way to your inbox.</p>
+  <ol>
+    <li><div><b>Check your email</b><span>Your receipt contains the download for the course: PDF workbooks and narrated videos. Can't find it? Check spam, or open your order at app.lemonsqueezy.com/my-orders.</span></div></li>
+    <li><div><b>Start with Module 01</b><span>Watch the video, then follow along with the PDF open next to Roblox Studio.</span></div></li>
+    <li><div><b>Join the community</b><span>Ask questions, share progress and get feedback on your game.</span></div></li>
+  </ol>
+  <a class="btn" id="discord" href="#">Join the Discord →</a>
+  <p class="small">Something wrong? Email <a href="mailto:hello@example.com" id="support">hello@example.com</a> and we'll sort it out. 14-day money-back guarantee.</p>
+</main>
+<script>
+  // SETTINGS: your Discord invite and support email
+  const DISCORD_INVITE = "";
+  const SUPPORT_EMAIL = "";
+  if (DISCORD_INVITE) document.getElementById("discord").href = DISCORD_INVITE;
+  else document.getElementById("discord").style.display = "none";
+  if (SUPPORT_EMAIL) { const a = document.getElementById("support"); a.href = "mailto:" + SUPPORT_EMAIL; a.textContent = SUPPORT_EMAIL; }
+</script>
+</body>
+</html>

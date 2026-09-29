@@ -1,0 +1,8 @@
+# Narration + audio mix for the video pipeline (python -m pip install -r videos/tts/requirements.txt)
+kokoro-onnx
+phonemizer-fork
+soundfile
+numpy
+# If Kokoro reports a missing espeak-ng-data/phontab file, install espeak-ng system-wide
+# (macOS: brew install espeak-ng · Debian/Ubuntu: sudo apt install espeak-ng) and set
+# PHONEMIZER_ESPEAK_LIBRARY to its library path.

@@ -6,3 +6,7 @@ node_modules/
 .env.local
 .env.*.local
 course/pdf/.build/
+videos/.work/
+videos/tts/models/
+__pycache__/
+dist/

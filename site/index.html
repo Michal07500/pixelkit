@@ -225,6 +225,11 @@
   .form-msg { font-weight: 600; min-height: 1.6em; margin: 0; }
   @media (max-width: 480px) { .field { flex-direction: column; gap: 10px; } }
 
+  .trailer { padding-top: 0; border-top: 0; }
+  .trailer h2 { margin-bottom: 36px; }
+  .video-frame { border: 1px solid var(--line-2); background: #000; box-shadow: 10px 10px 0 var(--line); aspect-ratio: 16 / 9; }
+  .video-frame video { width: 100%; height: 100%; display: block; }
+  .form-msg a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 3px; }
   footer { padding: 48px 0; color: var(--muted); font-size: 14px; }
   footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; }
   footer p { margin: 0; max-width: 640px; }
@@ -267,7 +272,7 @@
       <h1>Learn Roblox Studio. <span class="hl">Ship real games.</span></h1>
       <p class="lead">A project-based course that takes you from an empty baseplate to a published, monetized Roblox game. No experience required. Just a laptop and the drive to build.</p>
       <div class="cta-row">
-        <a href="#join" class="btn btn-primary" data-checkout="course">Get the free lesson <span class="arrow">→</span></a>
+        <a href="#join" class="btn btn-primary">Get the free lesson <span class="arrow">→</span></a>
         <a href="#curriculum" class="btn">View curriculum</a>
       </div>
       <div class="facts">
@@ -294,6 +299,16 @@ screenGui:<span class="f">Destroy</span>()</pre>
     </div>
   </div>
 </header>
+
+<section id="trailer" class="trailer">
+  <div class="wrap">
+    <div class="eyebrow">Watch</div>
+    <h2>30 seconds. That's the whole pitch.</h2>
+    <div class="video-frame">
+      <video src="media/trailer.mp4" poster="media/trailer-poster.jpg" controls playsinline preload="none"></video>
+    </div>
+  </div>
+</section>
 
 <section id="why">
   <div class="wrap">
@@ -375,8 +390,8 @@ screenGui:<span class="f">Destroy</span>()</pre>
         <p class="note">One-time payment</p>
         <ul>
           <li>All 9 modules, 43 lessons</li>
-          <li>Source files for every lesson</li>
-          <li>Your own shipped game</li>
+          <li>A narrated video for every module</li>
+          <li>PDF workbooks with all the code</li>
           <li>Private Discord community</li>
         </ul>
         <a href="#join" class="btn" data-checkout="course">Get the course</a>
@@ -406,7 +421,8 @@ screenGui:<span class="f">Destroy</span>()</pre>
         <a href="#join" class="btn" data-checkout="all">Get all access</a>
       </div>
     </div>
-    <p class="guarantee"><svg width="16" height="16" viewBox="0 0 4 4" shape-rendering="crispEdges" aria-hidden="true"><path fill="#c6ff3d" d="M0 2h1v1H0zM1 3h1v1H1zM2 2h1v1H2zM3 1h1v1H3z"/></svg>14-day money-back guarantee. Not for you? Email us for a full refund.</p>
+    <p class="guarantee" style="margin-top:28px">Genre Packs release one by one. Bundle and All Access buyers get each pack the day it launches.</p>
+    <p class="guarantee" style="margin-top:8px"><svg width="16" height="16" viewBox="0 0 4 4" shape-rendering="crispEdges" aria-hidden="true"><path fill="#c6ff3d" d="M0 2h1v1H0zM1 3h1v1H1zM2 2h1v1H2zM3 1h1v1H3z"/></svg>14-day money-back guarantee. Not for you? Email us for a full refund.</p>
   </div>
 </section>
 
@@ -480,12 +496,17 @@ screenGui:<span class="f">Destroy</span>()</pre>
     // Email collection endpoint (e.g. Formspree: https://formspree.io/f/XXXXXXX).
     // While empty, the form shows a notice instead of submitting.
     FORM_ENDPOINT: "",
-    // Checkout links (Lemon Squeezy / Gumroad / Stripe Payment Links).
-    // While empty, buy buttons scroll to the waitlist.
+    // Checkout links (Lemon Squeezy recommended, or Gumroad / Stripe Payment Links).
+    // Lemon Squeezy links open as an overlay on this page. While empty, buy buttons scroll to the waitlist.
     CHECKOUT: {
       course: "",
       bundle: "",
       all: "",
+    },
+    // Where subscribers download the free lesson after signing up (files live in site/free/).
+    FREE_LESSON: {
+      pdf: "free/pixelkit-free-lesson.pdf",
+      video: "free/pixelkit-free-lesson.mp4",
     },
   };
 
@@ -538,9 +559,26 @@ screenGui:<span class="f">Destroy</span>()</pre>
       <span class="soon">Coming soon</span>
     </article>`).join("");
 
+  let lemonLoaded = false;
   document.querySelectorAll("[data-checkout]").forEach(a => {
     const url = CONFIG.CHECKOUT[a.dataset.checkout];
-    if (url) { a.href = url; a.rel = "noopener"; }
+    if (!url) return;
+    a.rel = "noopener";
+    if (/lemonsqueezy\.com/.test(url)) {
+      // Lemon Squeezy overlay checkout: stays on this page, handles cards, PayPal, Apple Pay and EU VAT.
+      a.href = url + (url.includes("?") ? "&" : "?") + "embed=1";
+      a.classList.add("lemonsqueezy-button");
+      if (!lemonLoaded) {
+        lemonLoaded = true;
+        const script = document.createElement("script");
+        script.src = "https://assets.lemonsqueezy.com/lemon.js";
+        script.defer = true;
+        script.onload = () => window.createLemonSqueezy && window.createLemonSqueezy();
+        document.head.appendChild(script);
+      }
+    } else {
+      a.href = url;
+    }
   });
 
   document.getElementById("year").textContent = new Date().getFullYear();
@@ -564,7 +602,7 @@ screenGui:<span class="f">Destroy</span>()</pre>
       });
       if (!res.ok) throw new Error(res.status);
       form.reset();
-      msg.textContent = "You're in. Check your inbox, the free lesson is on its way.";
+      msg.innerHTML = `You're in! Your free lesson: <a href="${CONFIG.FREE_LESSON.pdf}" download>PDF</a> · <a href="${CONFIG.FREE_LESSON.video}" target="_blank" rel="noopener">narrated video</a>`;
     } catch {
       msg.textContent = "Something went wrong. Please try again in a moment.";
     } finally {

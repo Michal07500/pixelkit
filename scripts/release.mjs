@@ -1,0 +1,70 @@
+// Prepares everything for launch after the PDFs and videos are built.
+//
+//   node scripts/release.mjs
+//
+// 1. site/free/   ← free lesson PDF + narrated video (downloaded after email signup)
+// 2. site/media/  ← 16:9 trailer + poster frame for the landing page
+// 3. dist/PIXEL-KIT-Core-Course.zip ← what buyers download (upload it as the product file)
+//
+// Env: FFMPEG (default ffmpeg) for the poster frame.
+
+import { copyFileSync, existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import AdmZip from "adm-zip";
+
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const p = (...s) => join(ROOT, ...s);
+const FFMPEG = process.env.FFMPEG || "ffmpeg";
+const mb = (f) => (statSync(f).size / 1e6).toFixed(1) + " MB";
+
+function need(file) {
+  if (!existsSync(file)) {
+    console.error(`Missing ${file.replace(ROOT + "/", "")}. Build it first (npm run build:pdf / npm run build:videos).`);
+    process.exit(1);
+  }
+  return file;
+}
+
+function copy(from, to) {
+  mkdirSync(dirname(to), { recursive: true });
+  copyFileSync(need(from), to);
+  console.log(`${to.replace(ROOT + "/", "")}  (${mb(to)})`);
+}
+
+// 1. Free lesson for subscribers
+copy(p("course/pdf/00-free-lesson-intro-screen.pdf"), p("site/free/pixelkit-free-lesson.pdf"));
+copy(p("videos/out/course-m00-free-lesson-intro-screen.mp4"), p("site/free/pixelkit-free-lesson.mp4"));
+
+// 2. Trailer on the landing page
+copy(p("videos/out/ad-trailer-16x9.mp4"), p("site/media/trailer.mp4"));
+const poster = spawnSync(FFMPEG, ["-y", "-loglevel", "error", "-ss", "4.5", "-i", p("site/media/trailer.mp4"), "-frames:v", "1", "-q:v", "3", p("site/media/trailer-poster.jpg")]);
+if (poster.status === 0) console.log("site/media/trailer-poster.jpg");
+else console.warn("Could not extract the poster frame (is ffmpeg installed?). The video still works without it.");
+
+// 3. The paid course download
+const zip = new AdmZip();
+const pdfs = readdirSync(p("course/pdf")).filter((f) => f.endsWith(".pdf")).sort();
+for (const f of pdfs) zip.addLocalFile(p("course/pdf", f), "PDF");
+const videos = readdirSync(p("videos/out")).filter((f) => /^course-m\d\d-.*\.mp4$/.test(f)).sort();
+if (videos.length < 10) console.warn(`Only ${videos.length}/10 course videos found in videos/out.`);
+for (const f of videos) zip.addLocalFile(p("videos/out", f), "Videos", f.replace(/^course-/, ""));
+zip.addFile("START HERE.txt", Buffer.from(
+`PIXEL KIT: Learn Roblox Studio. Ship real games.
+
+How to use this course
+1. Open Videos/m01-getting-started.mp4 and watch it.
+2. Open PDF/01-getting-started.pdf next to Roblox Studio and follow along.
+3. Do every "Try it" exercise before moving on.
+4. Repeat for modules 02 to 09. By the end, Coin Rush is live on Roblox.
+
+PDF/pixelkit-full-course.pdf contains every module in one file.
+
+Questions or problems? Reply to your receipt email.
+PIXEL KIT is not affiliated with Roblox Corporation.
+`));
+mkdirSync(p("dist"), { recursive: true });
+const out = p("dist/PIXEL-KIT-Core-Course.zip");
+zip.writeZip(out);
+console.log(`dist/PIXEL-KIT-Core-Course.zip  (${mb(out)}, ${pdfs.length} PDFs, ${videos.length} videos)`);

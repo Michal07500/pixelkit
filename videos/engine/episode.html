@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!--
+  PIXEL KIT video engine. Renders any episode frame by frame.
+  build-episode.mjs injects window.EPISODE (timeline, captions, mouth envelope) and calls
+  window.renderFrame(t) for every frame. Scene types: title, bullets, code, statement,
+  compare, flow, checklist, grid, stats, cta.
+-->
+<link href="../../assets/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root { --bg:#07070a; --card:#121218; --card2:#17171f; --line:#23232e; --line2:#30303d; --text:#f5f5f7; --muted:#9b9bad; --accent:#c6ff3d; --deep:#6f9a00; --pink:#ff4fa3; --cyan:#3de0ff; --yellow:#ffd23d; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { overflow: hidden; background: var(--bg); color: var(--text); font-family: "Space Grotesk", sans-serif; }
+  body.landscape { width: 1920px; height: 1080px; }
+  body.portrait { width: 1080px; height: 1920px; }
+
+  #bg { position: absolute; inset: -80px; background-image: linear-gradient(var(--line) 1.5px, transparent 1.5px), linear-gradient(90deg, var(--line) 1.5px, transparent 1.5px); background-size: 64px 64px; opacity: .42; }
+  #glow { position: absolute; width: 1300px; height: 1300px; border-radius: 50%; background: radial-gradient(circle, rgba(198,255,61,.13), transparent 62%); }
+  #glow2 { position: absolute; width: 1000px; height: 1000px; border-radius: 50%; background: radial-gradient(circle, rgba(61,224,255,.08), transparent 62%); }
+  #particles i { position: absolute; display: block; }
+
+  #brand { position: absolute; display: flex; align-items: center; gap: 14px; font-family: Silkscreen, monospace; font-weight: 700; font-size: 26px; letter-spacing: .02em; }
+  #brand svg { width: 34px; height: 34px; }
+  #badge { position: absolute; font-family: Silkscreen, monospace; font-size: 20px; color: var(--muted); letter-spacing: .06em; padding: 9px 14px; border: 2px solid var(--line2); background: rgba(14,14,19,.85); }
+  #badge b { color: var(--accent); font-weight: 400; }
+  #progress { position: absolute; height: 6px; background: var(--accent); left: 0; }
+  body.landscape #brand { left: 72px; top: 56px; }
+  body.landscape #badge { right: 72px; top: 52px; }
+  body.landscape #progress { bottom: 0; }
+  body.portrait #brand { left: 64px; top: 150px; font-size: 30px; }
+  body.portrait #badge { left: 64px; top: 214px; font-size: 22px; }
+  body.portrait #progress { top: 0; height: 8px; }
+
+  #stage { position: absolute; }
+  body.landscape #stage { left: 150px; top: 150px; width: 1620px; height: 660px; }
+  body.portrait #stage { left: 64px; top: 320px; width: 890px; height: 820px; }
+  .scene { position: absolute; inset: 0; opacity: 0; display: flex; flex-direction: column; justify-content: center; }
+
+  /* Captions */
+  #captions { position: absolute; display: flex; justify-content: center; text-align: center; }
+  #captions span.box { display: inline-block; background: rgba(7,7,10,.82); border: 2px solid var(--line2); padding: 14px 26px; font-weight: 700; line-height: 1.25; letter-spacing: -0.01em; }
+  #captions .w { opacity: .55; transition: none; }
+  #captions .w.on { opacity: 1; }
+  #captions .w.now { color: var(--accent); opacity: 1; }
+  body.landscape #captions { left: 330px; right: 330px; top: 872px; font-size: 38px; }
+  body.portrait #captions { left: 64px; width: 860px; top: 1330px; font-size: 46px; }
+
+  /* Mascot */
+  #pix { position: absolute; }
+  body.landscape #pix { left: 70px; top: 820px; width: 190px; height: 190px; }
+  body.portrait #pix { left: 60px; top: 1178px; width: 140px; height: 140px; }
+  #pix svg { width: 100%; height: 100%; overflow: visible; }
+
+  /* Shared scene bits */
+  .eyebrow { font-family: Silkscreen, monospace; color: var(--accent); letter-spacing: .07em; font-size: 30px; margin-bottom: 22px; display: flex; align-items: center; gap: 14px; }
+  .eyebrow::before { content: ""; width: 14px; height: 14px; background: currentColor; }
+  h1, h2 { font-weight: 700; letter-spacing: -0.035em; line-height: 1.0; }
+  .hl { color: var(--accent); }
+  .word { display: inline-block; }
+
+  /* title */
+  .s-title { align-items: flex-start; }
+  .s-title .logo { position: relative; width: 208px; height: 208px; margin-bottom: 44px; }
+  .s-title .logo i { position: absolute; width: 26px; height: 26px; background: var(--accent); }
+  .s-title h1 { font-size: 132px; max-width: 1500px; }
+  .s-title .sub { font-size: 40px; color: var(--muted); margin-top: 30px; max-width: 1300px; font-weight: 500; letter-spacing: -0.01em; }
+  body.portrait .s-title h1 { font-size: 118px; }
+  body.portrait .s-title .sub { font-size: 42px; }
+
+  /* bullets */
+  .s-bullets h2, .s-checklist h2, .s-grid h2, .s-stats h2, .s-flow h2 { font-size: 74px; margin-bottom: 44px; }
+  .list { display: grid; gap: 20px; }
+  .row { display: flex; align-items: center; gap: 28px; padding: 22px 30px; background: var(--card); border: 2px solid var(--line); font-size: 40px; font-weight: 500; letter-spacing: -0.01em; }
+  .row .n { font-family: Silkscreen, monospace; color: var(--accent); font-size: 28px; min-width: 52px; }
+  .row.active { border-color: var(--accent); background: var(--card2); }
+  body.portrait .row { font-size: 42px; padding: 24px 28px; }
+  body.portrait .s-bullets h2, body.portrait .s-checklist h2, body.portrait .s-grid h2, body.portrait .s-stats h2, body.portrait .s-flow h2 { font-size: 78px; }
+
+  /* checklist */
+  .row .box { width: 46px; height: 46px; border: 4px solid var(--muted); position: relative; flex: none; }
+  .row .box b { position: absolute; inset: 7px; background: var(--accent); }
+
+  /* code */
+  .s-code { align-items: flex-start; }
+  .s-code .caption-top { align-self: flex-start; }
+  .win { background: #0e0e13; border: 3px solid var(--line2); box-shadow: 16px 16px 0 var(--line); font-family: "JetBrains Mono", monospace; font-variant-ligatures: none; max-width: 100%; }
+  .win-bar { display: flex; gap: 12px; align-items: center; padding: 16px 22px; border-bottom: 3px solid var(--line2); color: var(--muted); font-size: 22px; }
+  .win-bar i { width: 16px; height: 16px; display: block; flex: none; }
+  .win pre { padding: 26px 30px; color: #d6d6e0; white-space: pre; font-family: inherit; }
+  .win .ln { display: block; transition: none; }
+  .win .ln.dim { opacity: .32; }
+  .win .ln.focus { background: rgba(198,255,61,.08); box-shadow: inset 4px 0 0 var(--accent); }
+  .k { color: #ff6fb3; } .s { color: var(--accent); } .c { color: #6b6b80; font-style: italic; } .f { color: var(--cyan); } .n { color: var(--yellow); } .b { color: #8fd8ff; }
+  .cursor { display: inline-block; width: .55em; height: 1.1em; background: var(--accent); vertical-align: -0.2em; }
+
+  /* statement */
+  .s-statement { align-items: flex-start; }
+  .s-statement h1 { font-size: 104px; max-width: 1560px; }
+  .s-statement h1 .em { color: var(--accent); position: relative; }
+  .s-statement .sub { margin-top: 40px; font-size: 40px; color: var(--muted); font-weight: 500; max-width: 1300px; }
+  body.portrait .s-statement h1 { font-size: 96px; }
+
+  /* compare */
+  .cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; }
+  body.portrait .cmp { grid-template-columns: 1fr; gap: 28px; }
+  .cmp .side { background: var(--card); border: 3px solid var(--line2); padding: 30px; }
+  .cmp .side.bad { border-color: var(--pink); }
+  .cmp .side.good { border-color: var(--accent); }
+  .cmp .tag { display: inline-block; font-family: Silkscreen, monospace; font-size: 24px; padding: 6px 12px; margin-bottom: 18px; }
+  .cmp .bad .tag { background: var(--pink); color: #1a0010; }
+  .cmp .good .tag { background: var(--accent); color: #0b0f00; }
+  .cmp h3 { font-size: 40px; margin-bottom: 16px; letter-spacing: -0.02em; }
+  .cmp pre { font-family: "JetBrains Mono", monospace; font-variant-ligatures: none; font-size: 24px; line-height: 1.55; color: #d6d6e0; white-space: pre; background: #0b0b10; padding: 18px 20px; border: 2px solid var(--line); }
+  .cmp p { font-size: 30px; color: #d0d0da; line-height: 1.35; }
+
+  /* flow */
+  .flow { display: flex; align-items: center; gap: 0; }
+  body.portrait .flow { flex-direction: column; align-items: stretch; }
+  .node { flex: 1; background: var(--card); border: 3px solid var(--line2); padding: 34px 28px; text-align: center; }
+  .node .ico { font-family: Silkscreen, monospace; font-size: 26px; color: var(--accent); margin-bottom: 12px; }
+  .node b { display: block; font-size: 42px; letter-spacing: -0.02em; }
+  .node span { display: block; font-size: 26px; color: var(--muted); margin-top: 8px; }
+  .arrow { position: relative; width: 120px; height: 6px; flex: none; }
+  body.portrait .arrow { width: 6px; height: 70px; margin: 0 auto; }
+  .arrow .line { position: absolute; left: 0; top: 0; height: 100%; width: 0; background: var(--accent); }
+  body.portrait .arrow .line { width: 100%; height: 0; }
+  .arrow .dot { position: absolute; width: 18px; height: 18px; background: var(--yellow); top: -6px; opacity: 0; }
+  body.portrait .arrow .dot { left: -6px; top: 0; }
+  .arrow .lbl { position: absolute; top: -48px; left: 50%; transform: translateX(-50%); font-family: Silkscreen, monospace; font-size: 18px; color: var(--muted); white-space: nowrap; }
+  body.portrait .arrow .lbl { top: 50%; left: 30px; transform: translateY(-50%); }
+
+  /* grid */
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  body.portrait .tiles { grid-template-columns: repeat(2, 1fr); }
+  .tile { background: var(--card); border: 4px solid var(--c); padding: 30px 26px; height: 190px; display: flex; flex-direction: column; justify-content: space-between; }
+  .tile i { width: 44px; height: 44px; background: var(--c); display: block; box-shadow: inset 0 0 0 11px #000; }
+  .tile span { font-size: 38px; font-weight: 700; letter-spacing: -0.02em; }
+
+  /* stats */
+  .stats { display: grid; grid-template-columns: repeat(var(--cols), 1fr); gap: 26px; }
+  body.portrait .stats { grid-template-columns: 1fr 1fr; }
+  .stat { background: var(--card); border: 3px solid var(--line2); padding: 36px 30px; }
+  .stat b { display: block; font-size: 120px; letter-spacing: -0.05em; color: var(--accent); line-height: 1; }
+  .stat span { display: block; font-size: 32px; color: var(--muted); margin-top: 12px; }
+
+  /* cta */
+  .s-cta { align-items: center; text-align: center; }
+  .s-cta .logo { width: 170px; height: 170px; margin-bottom: 44px; }
+  .s-cta h1 { font-size: 112px; }
+  .s-cta .sub { font-size: 40px; color: var(--muted); margin-top: 26px; font-weight: 500; }
+  .s-cta .btn { margin-top: 54px; font-family: Silkscreen, monospace; font-size: 40px; background: var(--accent); color: #0b0f00; padding: 28px 46px; box-shadow: 12px 12px 0 var(--deep); }
+  body.portrait .s-cta h1 { font-size: 104px; }
+</style>
+</head>
+<body>
+<div id="bg"></div><div id="glow"></div><div id="glow2"></div>
+<div id="particles"></div>
+<div id="brand"><svg viewBox="0 0 8 8" shape-rendering="crispEdges"><rect width="8" height="8" fill="#000"/><path fill="#c6ff3d" d="M1 1h4v1H1zM1 2h1v5H1zM4 2h1v2H4zM2 3h2v1H2zM6 1h1v6H6z"/></svg>PIXEL KIT</div>
+<div id="badge"></div>
+<div id="stage"></div>
+<div id="captions"></div>
+<div id="pix"></div>
+<div id="progress"></div>
+
+<script>
+const EP = window.EPISODE;
+const $ = (id) => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const p = (t, s, d) => clamp((t - s) / d);
+const out3 = (x) => 1 - Math.pow(1 - x, 3);
+const inOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const back = (x) => { const c1 = 1.7, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const PORTRAIT = EP.format === "portrait";
+document.body.className = PORTRAIT ? "portrait" : "landscape";
+const W = PORTRAIT ? 1080 : 1920, H = PORTRAIT ? 1920 : 1080;
+
+// Deterministic pseudo-random
+let seed = 1234567;
+const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+
+// ---------- Luau syntax highlighting
+const KW = new Set("and break do else elseif end false for function if in local nil not or repeat return then true until while continue type export".split(" "));
+const BI = new Set("game workspace script task print warn require Instance Vector3 Vector2 CFrame Color3 UDim2 UDim TweenInfo Enum math string table os pcall typeof tostring tonumber ipairs pairs".split(" "));
+function tokenize(line) {
+  const out = [];
+  const re = /(--.*$)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`[^`]*`)|(\b\d+(?:\.\d+)?\b)|([A-Za-z_][A-Za-z0-9_]*)|(\s+)|(.)/g;
+  let m, prevColon = false;
+  while ((m = re.exec(line))) {
+    if (m[1]) out.push(["c", m[1]]);
+    else if (m[2]) out.push(["s", m[2]]);
+    else if (m[3]) out.push(["n", m[3]]);
+    else if (m[4]) {
+      const w = m[4];
+      const after = line.slice(re.lastIndex).match(/^\s*\(/);
+      if (KW.has(w)) out.push(["k", w]);
+      else if (BI.has(w)) out.push(["b", w]);
+      else if ((prevColon || /^\s*\(/.test(line.slice(re.lastIndex))) && after) out.push(["f", w]);
+      else out.push(["", w]);
+    } else out.push(["", m[5] || m[6]]);
+    prevColon = m[6] === ":" || m[6] === ".";
+  }
+  return out;
+}
+function lineHTML(tokens, limit) {
+  let html = "", left = limit;
+  for (const [cls, s] of tokens) {
+    if (left <= 0) break;
+    const part = esc(s.slice(0, left));
+    html += cls ? `<span class="${cls}">${part}</span>` : part;
+    left -= s.length;
+  }
+  return html;
+}
+
+// ---------- Pixel logo
+const LOGO_PIX = [];
+{ const add = (x, y, w, h) => { for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) LOGO_PIX.push([x + i, y + j]); };
+  add(1, 1, 4, 1); add(1, 2, 1, 5); add(4, 2, 1, 2); add(2, 3, 2, 1); add(6, 1, 1, 6);
+  LOGO_PIX.sort((a, b) => a[0] + a[1] - (b[0] + b[1])); }
+const LOGO_SVG = `<svg viewBox="0 0 8 8" shape-rendering="crispEdges" width="100%" height="100%"><rect width="8" height="8" fill="#000"/><path fill="#c6ff3d" d="M1 1h4v1H1zM1 2h1v5H1zM4 2h1v2H4zM2 3h2v1H2zM6 1h1v6H6z"/></svg>`;
+
+// ---------- Build scenes
+const stage = $("stage");
+const SCENES = EP.segments.map((seg, i) => {
+  const sc = seg.scene;
+  const el = document.createElement("div");
+  el.className = `scene s-${sc.type}`;
+  let html = "";
+  // Split into words; *emphasis* may span several words.
+  const words = (text) => String(text).split(/(\*[^*]+\*)/).filter(Boolean).map((part) => {
+    const em = /^\*([^*]+)\*$/.exec(part);
+    return (em ? em[1] : part).split(" ").filter(Boolean)
+      .map((w) => `<span class="word${em ? " em hl" : ""}">${esc(w)}</span>`).join(" ");
+  }).join(" ");
+  switch (sc.type) {
+    case "title":
+      html = `<div class="logo">${LOGO_PIX.map(([x, y]) => `<i style="left:${x * 26}px;top:${y * 26}px"></i>`).join("")}</div>
+        ${sc.eyebrow ? `<div class="eyebrow">${esc(sc.eyebrow)}</div>` : ""}
+        <h1>${words(sc.title)}</h1>${sc.sub ? `<div class="sub">${esc(sc.sub)}</div>` : ""}`;
+      break;
+    case "bullets":
+      html = `${sc.eyebrow ? `<div class="eyebrow">${esc(sc.eyebrow)}</div>` : ""}<h2>${words(sc.heading)}</h2>
+        <div class="list">${sc.items.map((it, k) => `<div class="row"><span class="n">${String(k + 1).padStart(2, "0")}</span><span>${esc(it)}</span></div>`).join("")}</div>`;
+      break;
+    case "checklist":
+      html = `${sc.eyebrow ? `<div class="eyebrow">${esc(sc.eyebrow)}</div>` : ""}<h2>${words(sc.heading)}</h2>
+        <div class="list">${sc.items.map((it) => `<div class="row"><span class="box"><b></b></span><span>${esc(it)}</span></div>`).join("")}</div>`;
+      break;
+    case "code": {
+      const lines = sc.code.replace(/\t/g, "    ").split("\n");
+      sc._lines = lines.map(tokenize);
+      sc._len = lines.map((l) => l.length);
+      const maxLen = Math.max(...sc._len, 20);
+      const stageW = PORTRAIT ? 890 : 1620, stageH = PORTRAIT ? 820 : 660;
+      const avail = stageH - (sc.eyebrow ? 58 : 0) - 125;
+      const fs = Math.floor(Math.min(PORTRAIT ? 34 : 40, (stageW - 90) / (maxLen * 0.61), avail / (lines.length * 1.55)));
+      html = `${sc.eyebrow ? `<div class="eyebrow caption-top">${esc(sc.eyebrow)}</div>` : ""}
+        <div class="win"><div class="win-bar"><i style="background:var(--pink)"></i><i style="background:var(--yellow)"></i><i style="background:var(--accent)"></i><span style="margin-left:8px">${esc(sc.file || "Script")}</span></div>
+        <pre style="font-size:${fs}px;line-height:1.55;min-width:${Math.min(stageW - 40, maxLen * fs * 0.61 + 70)}px">${lines.map(() => `<span class="ln"></span>`).join("")}</pre></div>`;
+      break;
+    }
+    case "statement":
+    {
+      // Short statements get bigger type
+      const len = sc.text.replace(/\*/g, "").length;
+      const size = PORTRAIT ? (len < 26 ? 136 : len < 42 ? 112 : 96) : (len < 30 ? 128 : 104);
+      html = `${sc.eyebrow ? `<div class="eyebrow">${esc(sc.eyebrow)}</div>` : ""}<h1 style="font-size:${size}px">${words(sc.text)}</h1>${sc.sub ? `<div class="sub">${esc(sc.sub)}</div>` : ""}`;
+      break;
+    }
+    case "compare": {
+      const side = (s, cls, tag) => `<div class="side ${cls}"><span class="tag">${tag}</span><h3>${esc(s.title)}</h3>${s.code ? `<pre>${s.code.split("\n").map((l) => lineHTML(tokenize(l), 999)).join("\n")}</pre>` : `<p>${esc(s.text)}</p>`}</div>`;
+      html = `${sc.eyebrow ? `<div class="eyebrow">${esc(sc.eyebrow)}</div>` : ""}<div class="cmp">${side(sc.bad, "bad", sc.bad.tag || "✕ DON'T")}${side(sc.good, "good", sc.good.tag || "✓ DO")}</div>`;
+      break;
+    }
+    case "flow":
+      html = `${sc.heading ? `<h2>${words(sc.heading)}</h2>` : ""}<div class="flow">${sc.nodes.map((n, k) => `${k ? `<div class="arrow"><div class="line"></div><div class="dot"></div>${sc.edges && sc.edges[k - 1] ? `<div class="lbl">${esc(sc.edges[k - 1])}</div>` : ""}</div>` : ""}<div class="node"><div class="ico">${esc(n.icon || "■")}</div><b>${esc(n.label)}</b>${n.sub ? `<span>${esc(n.sub)}</span>` : ""}</div>`).join("")}</div>`;
+      break;
+    case "grid":
+      html = `${sc.heading ? `<h2>${words(sc.heading)}</h2>` : ""}<div class="tiles">${sc.tiles.map((t) => `<div class="tile" style="--c:${t.color || "var(--accent)"}"><i></i><span>${esc(t.label)}</span></div>`).join("")}</div>`;
+      break;
+    case "stats":
+      html = `${sc.heading ? `<h2>${words(sc.heading)}</h2>` : ""}<div class="stats" style="--cols:${sc.items.length}">${sc.items.map((s) => `<div class="stat"><b data-v="${esc(s.value)}">0</b><span>${esc(s.label)}</span></div>`).join("")}</div>`;
+      break;
+    case "cta":
+      html = `<div class="logo">${LOGO_SVG}</div><h1>${words(sc.title)}</h1>${sc.sub ? `<div class="sub">${esc(sc.sub)}</div>` : ""}${sc.button ? `<div class="btn">${esc(sc.button)}</div>` : ""}`;
+      break;
+  }
+  el.innerHTML = html;
+  stage.appendChild(el);
+  return el;
+});
+
+// ---------- Particles
+const PARTS = Array.from({ length: 26 }, () => ({ x: rnd() * W, y: rnd() * H, s: 4 + Math.floor(rnd() * 3) * 4, sp: 8 + rnd() * 22, ph: rnd() * 6.28, c: ["#c6ff3d", "#3de0ff", "#ff4fa3", "#ffd23d"][Math.floor(rnd() * 4)] }));
+$("particles").innerHTML = PARTS.map((q) => `<i style="width:${q.s}px;height:${q.s}px;background:${q.c}"></i>`).join("");
+const partEls = [...$("particles").children];
+
+// ---------- Badge
+$("badge").innerHTML = EP.badge ? EP.badge.replace(/^(\S+ \S+)/, "<b>$1</b>") : "";
+if (!EP.badge) $("badge").style.display = "none";
+
+// ---------- Mascot "Pix"
+$("pix").innerHTML = `<svg viewBox="0 0 16 16" shape-rendering="crispEdges">
+  <rect id="pxTip" x="7" y="0" width="2" height="1.2" fill="#c6ff3d"/>
+  <rect x="7.5" y="1.2" width="1" height="2" fill="#6b6b80"/>
+  <rect x="1" y="6" width="1.4" height="4" fill="#30303d"/><rect x="13.6" y="6" width="1.4" height="4" fill="#30303d"/>
+  <rect x="2" y="3" width="12" height="11" fill="#1c1c26"/>
+  <rect x="2" y="3" width="12" height="0.6" fill="#30303d"/>
+  <rect x="3.4" y="4.6" width="9.2" height="7.2" fill="#07070a"/>
+  <rect id="pxEyeL" x="5" y="6" width="1.6" height="1.6" fill="#c6ff3d"/>
+  <rect id="pxEyeR" x="9.4" y="6" width="1.6" height="1.6" fill="#c6ff3d"/>
+  <rect id="pxMouth" x="6.3" y="9.3" width="3.4" height="0.5" fill="#c6ff3d"/>
+  <rect x="4" y="14" width="3" height="1.2" fill="#30303d"/><rect x="9" y="14" width="3" height="1.2" fill="#30303d"/>
+</svg>`;
+const pxSvg = $("pix").firstElementChild, pxMouth = $("pxMouth"), pxEyeL = $("pxEyeL"), pxEyeR = $("pxEyeR"), pxTip = $("pxTip");
+
+// ---------- Captions
+const capBox = $("captions");
+let capKey = "";
+
+// ---------- Per-scene animation
+function animate(seg, el, t) {
+  const sc = seg.scene, lt = t - seg.start;
+  const beats = seg.beats;
+  const beatAt = (k) => (beats[k] ? beats[k].start - seg.start : beats.length ? beats[beats.length - 1].start - seg.start + (k - beats.length + 1) * 0.6 : 0.3 + k * 0.6);
+  const rise = (node, k, dist = 50) => { node.style.opacity = clamp(k); node.style.transform = `translateY(${(1 - k) * dist}px)`; };
+
+  switch (sc.type) {
+    case "title": {
+      el.querySelectorAll(".logo i").forEach((px, i) => { const k = back(p(lt, 0.05 + i * 0.03, 0.32)); px.style.transform = `scale(${k})`; px.style.opacity = clamp(k * 3); });
+      const eb = el.querySelector(".eyebrow"); if (eb) rise(eb, out3(p(lt, 0.45, 0.45)));
+      el.querySelectorAll("h1 .word").forEach((w, i) => { const k = back(p(lt, 0.6 + i * 0.09, 0.45)); w.style.opacity = clamp(k); w.style.transform = `translateY(${(1 - k) * 70}px)`; });
+      const sub = el.querySelector(".sub"); if (sub) rise(sub, out3(p(lt, 1.2, 0.5)));
+      break;
+    }
+    case "bullets":
+    case "checklist": {
+      const eb = el.querySelector(".eyebrow"); if (eb) rise(eb, out3(p(lt, 0.05, 0.4)));
+      el.querySelectorAll("h2 .word").forEach((w, i) => { const k = out3(p(lt, 0.05 + i * 0.05, 0.4)); w.style.opacity = k; w.style.transform = `translateY(${(1 - k) * 40}px)`; });
+      const rows = [...el.querySelectorAll(".row")];
+      const offset = sc.headingBeat ? 1 : 0;
+      rows.forEach((r, k) => {
+        const at = sc.type === "checklist" ? 0.35 + k * 0.08 : beatAt(k + offset);
+        const kk = out3(p(lt, at, 0.4));
+        r.style.opacity = clamp(kk); r.style.transform = `translateX(${(1 - kk) * -80}px)`;
+        if (sc.type === "bullets") {
+          const next = k + 1 < rows.length ? beatAt(k + 1 + offset) : 1e9;
+          r.classList.toggle("active", lt >= at && lt < next);
+        } else {
+          const ck = back(p(lt, beatAt(k + offset), 0.3));
+          r.querySelector("b").style.transform = `scale(${ck})`;
+          r.querySelector(".box").style.borderColor = ck > 0.5 ? "var(--accent)" : "var(--muted)";
+          r.classList.toggle("active", ck > 0.5 && (k + 1 >= rows.length || lt < beatAt(k + 1 + offset)));
+        }
+      });
+      break;
+    }
+    case "code": {
+      const eb = el.querySelector(".eyebrow"); if (eb) rise(eb, out3(p(lt, 0.05, 0.4)));
+      const win = el.querySelector(".win"); rise(win, out3(p(lt, 0.05, 0.45)), 60);
+      const lines = [...el.querySelectorAll(".ln")];
+      const steps = sc.steps || [[1, lines.length]];
+      // total chars revealed: type each step's lines during its beat
+      const reveal = lines.map(() => 0);
+      steps.forEach(([a, b], k) => {
+        const start = beatAt(k) + 0.1;
+        const dur = Math.max(0.6, Math.min(2.8, (beats[k] ? beats[k].end - beats[k].start : 2.5) * 0.75));
+        const chars = sc._len.slice(a - 1, b).reduce((s, n) => s + n, 0) || 1;
+        let n = Math.floor(chars * clamp((lt - start) / dur));
+        for (let li = a - 1; li < b; li++) { const take = Math.min(sc._len[li], n); reveal[li] = Math.max(reveal[li], lt >= start ? take : 0); n -= sc._len[li]; if (n < 0) n = 0; }
+      });
+      let cursorLine = -1;
+      lines.forEach((ln, i) => {
+        ln.innerHTML = lineHTML(sc._lines[i], reveal[i]) + "​";
+        if (reveal[i] > 0 && reveal[i] < sc._len[i]) cursorLine = i;
+      });
+      if (cursorLine < 0) { for (let i = lines.length - 1; i >= 0; i--) if (reveal[i] > 0) { cursorLine = i; break; } }
+      const blink = Math.floor(t * 2.5) % 2 === 0;
+      if (cursorLine >= 0 && blink) lines[cursorLine].innerHTML = lines[cursorLine].innerHTML.replace(/​$/, "") + `<span class="cursor"></span>`;
+      // focus ranges per beat
+      let focus = null;
+      if (sc.focus) sc.focus.forEach((f, k) => { if (f && lt >= beatAt(k)) focus = f; });
+      lines.forEach((ln, i) => {
+        const inF = focus && i + 1 >= focus[0] && i + 1 <= focus[1];
+        ln.classList.toggle("focus", !!inF && reveal[i] > 0);
+        ln.classList.toggle("dim", !!focus && !inF && reveal[i] > 0);
+      });
+      break;
+    }
+    case "statement": {
+      const eb = el.querySelector(".eyebrow"); if (eb) rise(eb, out3(p(lt, 0.05, 0.4)));
+      const ws = [...el.querySelectorAll("h1 .word")];
+      ws.forEach((w, i) => { const k = back(p(lt, 0.1 + i * 0.07, 0.4)); w.style.opacity = clamp(k); w.style.transform = `translateY(${(1 - k) * 60}px) scale(${0.9 + 0.1 * k})`; });
+      el.querySelectorAll(".em").forEach((w) => { const k = p(lt, 0.1 + ws.length * 0.07, 0.4); w.style.textShadow = `0 0 ${30 * k}px rgba(198,255,61,${0.45 * k})`; });
+      const sub = el.querySelector(".sub"); if (sub) rise(sub, out3(p(lt, beats.length > 1 ? beatAt(1) : 1.2, 0.5)));
+      break;
+    }
+    case "compare": {
+      const eb = el.querySelector(".eyebrow"); if (eb) rise(eb, out3(p(lt, 0.05, 0.4)));
+      const [bad, good] = el.querySelectorAll(".side");
+      const kb = back(p(lt, 0.15, 0.5)); bad.style.opacity = clamp(kb); bad.style.transform = `translateY(${(1 - kb) * 60}px)`;
+      const kg = back(p(lt, beats.length > 1 ? beatAt(1) : 1.5, 0.5)); good.style.opacity = clamp(kg); good.style.transform = `translateY(${(1 - kg) * 60}px)`;
+      bad.style.filter = kg > 0.5 ? "saturate(.5) brightness(.8)" : "none";
+      break;
+    }
+    case "flow": {
+      const h = el.querySelector("h2"); if (h) rise(h, out3(p(lt, 0.05, 0.4)));
+      const nodes = [...el.querySelectorAll(".node")], arrows = [...el.querySelectorAll(".arrow")];
+      nodes.forEach((n, k) => { const at = beatAt(k); const kk = back(p(lt, at, 0.45)); n.style.opacity = clamp(kk); n.style.transform = `scale(${0.8 + 0.2 * kk})`; n.style.borderColor = lt >= at && (k + 1 >= nodes.length || lt < beatAt(k + 1)) ? "var(--accent)" : "var(--line2)"; });
+      arrows.forEach((a, k) => {
+        const at = beatAt(k + 1) - 0.35, kk = inOut(p(lt, at, 0.4));
+        const line = a.querySelector(".line"), dot = a.querySelector(".dot");
+        if (PORTRAIT) line.style.height = kk * 100 + "%"; else line.style.width = kk * 100 + "%";
+        const lbl = a.querySelector(".lbl"); if (lbl) lbl.style.opacity = kk;
+        if (kk >= 1) { const ph = ((lt - at) * 0.9) % 1; dot.style.opacity = 1; if (PORTRAIT) dot.style.top = `calc(${ph * 100}% - 9px)`; else dot.style.left = `calc(${ph * 100}% - 9px)`; }
+        else dot.style.opacity = 0;
+      });
+      break;
+    }
+    case "grid": {
+      const h = el.querySelector("h2"); if (h) rise(h, out3(p(lt, 0.05, 0.4)));
+      el.querySelectorAll(".tile").forEach((tl, i) => { const k = back(p(lt, 0.35 + i * 0.12, 0.42)); tl.style.opacity = clamp(k); tl.style.transform = `scale(${0.6 + 0.4 * k}) rotate(${(1 - k) * (i % 2 ? 5 : -5)}deg)`; });
+      break;
+    }
+    case "stats": {
+      const h = el.querySelector("h2"); if (h) rise(h, out3(p(lt, 0.05, 0.4)));
+      el.querySelectorAll(".stat").forEach((s, k) => {
+        const at = beatAt(k); const kk = back(p(lt, at, 0.45)); s.style.opacity = clamp(kk); s.style.transform = `translateY(${(1 - kk) * 60}px)`;
+        const b = s.querySelector("b"); const target = b.dataset.v; const num = parseFloat(target);
+        if (!isNaN(num) && /^\d/.test(target)) { const c = out3(p(lt, at, 1.1)); b.textContent = Math.round(num * c) + target.replace(/^[\d.]+/, ""); } else b.textContent = target;
+      });
+      break;
+    }
+    case "cta": {
+      const lg = el.querySelector(".logo"); const kl = back(p(lt, 0.05, 0.5)); lg.style.transform = `scale(${kl})`;
+      el.querySelectorAll("h1 .word").forEach((w, i) => { const k = back(p(lt, 0.3 + i * 0.08, 0.45)); w.style.opacity = clamp(k); w.style.transform = `translateY(${(1 - k) * 60}px)`; });
+      const sub = el.querySelector(".sub"); if (sub) rise(sub, out3(p(lt, 0.9, 0.5)));
+      const btn = el.querySelector(".btn"); if (btn) { const k = back(p(lt, 1.3, 0.45)); const pulse = lt > 2 ? 1 + Math.max(0, Math.sin((lt - 2) * 4.5)) * 0.04 : 1; btn.style.opacity = clamp(k); btn.style.transform = `scale(${(0.7 + 0.3 * k) * pulse})`; }
+      break;
+    }
+  }
+}
+
+window.renderFrame = function (t) {
+  // Background life
+  $("bg").style.transform = `translate(${(t * 14) % 64}px, ${(t * 9) % 64}px)`;
+  $("glow").style.transform = `translate(${W * 0.45 + Math.sin(t * 0.3) * 180}px, ${H * 0.05 + Math.cos(t * 0.25) * 140}px)`;
+  $("glow2").style.transform = `translate(${-200 + Math.cos(t * 0.22) * 160}px, ${H * 0.55 + Math.sin(t * 0.27) * 120}px)`;
+  PARTS.forEach((q, i) => { const y = (q.y - t * q.sp) % H; partEls[i].style.transform = `translate(${q.x + Math.sin(t * 0.6 + q.ph) * 30}px, ${y < 0 ? y + H : y}px)`; partEls[i].style.opacity = 0.25 + 0.2 * Math.sin(t * 1.3 + q.ph); });
+  $("progress").style.width = (t / EP.duration) * 100 + "%";
+
+  // Scenes: crossfade between segments
+  EP.segments.forEach((seg, i) => {
+    const el = SCENES[i];
+    const last = i === EP.segments.length - 1;
+    const vis = Math.min(p(t, seg.start, 0.35), last ? 1 : 1 - p(t, seg.end - 0.28, 0.28));
+    if (vis <= 0) { if (el.style.opacity !== "0") el.style.opacity = 0; return; }
+    el.style.opacity = vis;
+    const drift = 1 + 0.025 * clamp((t - seg.start) / Math.max(1, seg.end - seg.start));
+    const enterShift = (1 - out3(p(t, seg.start, 0.45))) * 40;
+    el.style.transform = `translateX(${enterShift}px) scale(${drift})`;
+    animate(seg, el, t);
+  });
+
+  // Captions
+  let cap = null;
+  for (const c of EP.captions) if (t >= c.start && t < c.end + 0.15) cap = c;
+  const key = cap ? cap.start + ":" + cap.text : "";
+  if (key !== capKey) {
+    capKey = key;
+    capBox.innerHTML = cap ? `<span class="box">${cap.words.map((w) => `<span class="w">${esc(w.w)}</span>`).join(" ")}</span>` : "";
+  }
+  if (cap) {
+    const ws = capBox.querySelectorAll(".w");
+    cap.words.forEach((w, i) => { ws[i].classList.toggle("on", t >= w.t); ws[i].classList.toggle("now", t >= w.t && (i + 1 >= cap.words.length || t < cap.words[i + 1].t)); });
+    const k = out3(p(t, cap.start, 0.18));
+    capBox.style.opacity = k; capBox.style.transform = `translateY(${(1 - k) * 16}px)`;
+  } else capBox.style.opacity = 0;
+
+  // Mascot
+  const f = Math.min(EP.mouth.length - 1, Math.floor(t * EP.fps));
+  const m = EP.mouth[f] || 0;
+  pxMouth.setAttribute("height", (0.5 + m * 1.9).toFixed(2));
+  pxMouth.setAttribute("y", (9.55 - m * 0.95).toFixed(2));
+  pxMouth.setAttribute("width", (3.4 - m * 0.8).toFixed(2));
+  pxMouth.setAttribute("x", (6.3 + m * 0.4).toFixed(2));
+  const blink = (t % 3.7) < 0.13;
+  pxEyeL.setAttribute("height", blink ? 0.3 : 1.6); pxEyeR.setAttribute("height", blink ? 0.3 : 1.6);
+  pxEyeL.setAttribute("y", blink ? 6.7 : 6); pxEyeR.setAttribute("y", blink ? 6.7 : 6);
+  pxTip.setAttribute("fill", m > 0.15 ? "#ffd23d" : "#c6ff3d");
+  const bob = Math.sin(t * 2.2) * 4, tilt = Math.sin(t * 1.3) * 2 + m * 3;
+  const pin = back(p(t, 0.2, 0.6));
+  pxSvg.style.transform = `translateY(${bob + (1 - pin) * 200}px) rotate(${tilt}deg)`;
+};
+
+window.renderFrame(0);
+</script>
+</body>
+</html>
