@@ -87,11 +87,14 @@ Všetky videá sú v `videos/out/` ako **MP4 (H.264 + AAC)**. Prehrá ich hocič
 | `course-m00-…free-lesson…mp4` | Video k lekcii zadarmo (už je aj na webe v `site/free/`) |
 | `course-m01-…` až `course-m09-…` | Videá kurzu pre kupujúcich (sú v ZIP-e) |
 | `ad-trailer-16x9.mp4` | Trailer na web (je v `site/media/`), YouTube, Facebook |
-| `ig-day1-…` až `ig-day7-…` | Instagram Reels na celý týždeň (9:16) |
+| `ig-day1-…` až `ig-day7-…` | Instagram Reels na celý týždeň (9:16), s našim phonk beatom |
+| `ig-day…-nomusic.mp4` | Tie isté Reels bez hudby, na pridanie trendového songu priamo v Instagrame |
 
 **Ako ich dostať na telefón:** stiahni ich z GitHubu (otvor súbor → **Download raw file**) alebo si ich pošli cez Google Drive / AirDrop / WhatsApp sebe.
 
 **Najpohodlnejšie plánovanie:** **Meta Business Suite** (business.facebook.com) na počítači. Prepoj Instagram, **Create reel**, nahraj video, vlož popisku z `social/INSTAGRAM-WEEK.md` a daj **Schedule** na konkrétny deň a čas. Celý týždeň naplánuješ za 20 minút.
+
+**Trendový song:** chceš známu pesničku? Nahraj verziu **`-nomusic`**, v Instagrame ťukni na **♪ Audio**, vyber trendový song (šípka ↗ = trenduje) a v **Mix audio** daj song na 20–30 %, pôvodný zvuk na 100 %. Songy z knižnice Instagramu sú licencované, takže reel nebude stlmený. (Známe songy nemôžem vložiť priamo do súborov, to by porušilo autorské práva.)
 
 **Karusely:** v `social/carousels/<názov>/` sú obrázky `slide-01.png` a ďalšie. Na Instagrame daj nový príspevok, vyber všetky slidy v poradí.
 
@@ -124,6 +127,11 @@ Celý plán s popiskami, hashtagmi a časmi je v **`social/INSTAGRAM-WEEK.md`**.
    npm run hf:generate
    ```
    Klipy sa uložia do `videos/ai/`. Skript sa sám zastaví, keď dôjdu kredity, a pri opakovanom spustení neplatí znova za už stiahnuté klipy.
+6. Prerenderuj reklamy (potrebuješ nastavenie z časti 7.3):
+   ```bash
+   npm run build:ads
+   ```
+   AI zábery sa samy vložia do pozadia scén v Reels (každá reklama vie, ktorý klip kam patrí). Výsledok nájdeš opäť vo `videos/out/`.
 
 **Možnosť B: povoliť Higgsfield v cloude pre Clauda**
 V nastaveniach cloudového prostredia (menu prostredia v hlavičke session → **Edit**):

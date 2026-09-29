@@ -3,17 +3,17 @@ export default {
   id: "ig-day2-mobile-ui",
   format: "portrait",
   badge: "ROBLOX DEV TIP #1",
-  music: "hype",
-  musicDb: -17,
-  energy: true,
-  speed: 1.12,
+  style: "adhd",
+  music: "phonk",
+  musicDb: -23,
+  speed: 1.18,
   segments: [
     {
-      scene: { type: "statement", text: "Over *half* your players are on phones." },
+      scene: { sticker: "📱", type: "statement", text: "Over *half* your players are on phones." },
       say: "Over half of your players are on phones.",
     },
     {
-      scene: { type: "punch", text: "*5 seconds.*", sub: "That's how long they give a broken UI." },
+      scene: { sticker: "⏱️", type: "punch", text: "*5 seconds.*", sub: "That's how long they give a broken UI." },
       say: ["Five seconds.", "That's how long they give a broken UI before they leave. Forever."],
     },
     {
@@ -30,11 +30,11 @@ export default {
       say: ["The pro checklist!", "Size with scale.", "Lock shapes with an aspect ratio constraint.", "Center with anchor point point five.", "And always test in the device emulator."],
     },
     {
-      scene: { type: "punch", text: "More players. *More Robux.*" },
+      scene: { sticker: "💰", type: "punch", text: "More players. *More Robux.*" },
       say: "Players who stay are players who pay.",
     },
     {
-      scene: { type: "cta", title: "Build games that *keep players.*", sub: "First lesson free", button: "LINK IN BIO" },
+      scene: { sticker: "🚀", type: "cta", title: "Build games that *keep players.*", sub: "First lesson free", button: "LINK IN BIO" },
       say: "Save this, and grab the free lesson. Link in bio.",
     },
   ],

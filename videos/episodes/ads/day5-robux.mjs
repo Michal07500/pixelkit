@@ -3,17 +3,17 @@ export default {
   id: "ig-day5-robux",
   format: "portrait",
   badge: "HOW ROBLOX GAMES EARN",
-  music: "hype",
-  musicDb: -17,
-  energy: true,
-  speed: 1.12,
+  style: "adhd",
+  music: "phonk",
+  musicDb: -23,
+  speed: 1.18,
   segments: [
     {
-      scene: { type: "statement", eyebrow: "DEVELOPER EXCHANGE", text: "Roblox pays creators *hundreds of millions* a year.", sub: "Eligible creators cash out Robux for real money." },
+      scene: { broll: "coin-burst", sticker: "💸", type: "statement", eyebrow: "DEVELOPER EXCHANGE", text: "Roblox pays creators *hundreds of millions* a year.", sub: "Eligible creators cash out Robux for real money." },
       say: ["Roblox pays its creators hundreds of millions of dollars a year.", "Eligible creators cash out their Robux for real money."],
     },
     {
-      scene: { type: "punch", text: "But *how?*" },
+      scene: { broll: "tycoon-factory", sticker: "🤔", type: "punch", text: "But *how?*" },
       say: "But how does a game actually earn?",
     },
     {
@@ -23,7 +23,7 @@ export default {
       say: ["Two ways. Game passes are bought once: double coins, VIP, special tools.", "Developer products can be bought again and again: coin packs, revives, boosts."],
     },
     {
-      scene: {
+      scene: { sticker: "🔔",
         type: "notify",
         items: [
           { icon: "R$", title: "+R$ 99 · 2× Coins", sub: "Game Pass purchased", color: "#ffd23d" },
@@ -39,7 +39,7 @@ export default {
       say: ["The secret? Players pay when", "the free game is already fun,", "it's never pay to win,", "there's a cheap first purchase,", "and offers show up at the right moment."],
     },
     {
-      scene: { type: "cta", title: "Build a game that *earns.*", sub: "We build a full store in Module 08", button: "LINK IN BIO" },
+      scene: { sticker: "🚀", type: "cta", title: "Build a game that *earns.*", sub: "We build a full store in Module 08", button: "LINK IN BIO" },
       say: "Learn to build a game that earns, the right way. Link in bio!",
     },
   ],

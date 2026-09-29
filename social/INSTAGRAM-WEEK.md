@@ -1,6 +1,6 @@
 # PIXEL KIT · Instagram launch week
 
-Seven days of ready-to-post content. Every Reel is built on an emotional hook, has a high-energy narrator, burned-in captions (most people watch muted), music and sound effects. Files are in `videos/out/` and `social/carousels/`.
+Seven days of ready-to-post content. Every Reel is built on an emotional hook, cut fast (a new visual beat every 1–2 seconds), with a high-energy narrator, burned-in captions (most people watch muted), music and sound effects. Files are in `videos/out/` and `social/carousels/`.
 
 **Before day 1**
 - Profile name: `PIXEL KIT | Roblox Studio course`
@@ -8,6 +8,14 @@ Seven days of ready-to-post content. Every Reel is built on an emotional hook, h
 - Link in bio: your website (Netlify URL or domain)
 - Profile picture: `assets/brand/instagram-profile-1080.png`
 - Pin posts 1 (trailer), 6 (what's inside) and 7 (free lesson) at the end of the week
+
+**Music: two versions of every Reel**
+- `ig-dayN-….mp4` has our own royalty-free phonk beat baked in. Safe to post anywhere, never muted.
+- `ig-dayN-…-nomusic.mp4` has only the narrator and sound effects. Use it to add a **trending song** from Instagram's own music library (licensed by Instagram, so the Reel won't be muted):
+  1. New Reel → pick the `-nomusic` video → **Next**.
+  2. Tap the ♪ **Audio** button → search a trending track (look for the ↗ arrow next to songs = trending).
+  3. Choose the part of the song with the drop, then **Mix audio** / volume: song ~20–30 %, original audio 100 % so the narrator stays clear.
+  - For business accounts only the **Meta Sound Collection** is available; phonk/drift beats are in there too. Search "phonk".
 
 **Best posting times** for a 17–25 audience: weekdays 18:00–21:00, weekends 11:00–14:00 (your audience's time zone). After a week, check **Insights → Content** and move to the times that performed best.
 

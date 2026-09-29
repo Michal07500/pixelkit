@@ -9,7 +9,7 @@
 // Env: PYTHON (default python3), FFMPEG (default ffmpeg), KOKORO_DIR (TTS model folder).
 
 import { spawn, spawnSync } from "node:child_process";
-import { mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
 import { cpus } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -53,9 +53,12 @@ log(`narration: ${jobs.length} lines`);
 const voiceInfo = JSON.parse(run(PYTHON, [join(HERE, "tts", "tts.py"), join(work, "jobs.json"), join(HERE, ".work", "_voice")], { stdio: ["ignore", "pipe", "inherit"] }));
 
 // ---------------------------------------------------------------- 2. timeline
-const ENERGY = !!ep.energy;
-const LEAD = ENERGY ? { title: 0.9, cta: 0.6, punch: 0.22 } : { title: 1.3, cta: 0.9 };
-const GAP = ENERGY ? 0.16 : 0.32;
+const ADHD = ep.style === "adhd";
+const ENERGY = !!ep.energy || ADHD;
+// Must match the tempos in videos/tts/mix.py (beat pulse in the engine follows the music)
+const MUSIC_META = { calm: { bpm: 86, intro: 0 }, hype: { bpm: 124, intro: 4 * 60 / 124 }, phonk: { bpm: 130, intro: 4 * 60 / 130 } };
+const LEAD = ADHD ? { title: 0.6, cta: 0.45, punch: 0.12 } : ENERGY ? { title: 0.9, cta: 0.6, punch: 0.22 } : { title: 1.3, cta: 0.9 };
+const GAP = ADHD ? 0.08 : ENERGY ? 0.16 : 0.32;
 const hits = [];
 let cursor = 0.4;
 const clips = [];
@@ -72,7 +75,7 @@ const segments = segs.map((s, i) => {
   });
   const lastEnd = beats.length ? beats[beats.length - 1].end : start + 2;
   const isLast = i === segs.length - 1;
-  const end = lastEnd + (s.hold || 0) + (isLast ? 2.6 : ENERGY ? 0.3 : 0.6);
+  const end = lastEnd + (s.hold || 0) + (isLast ? 2.4 : ADHD ? 0.15 : ENERGY ? 0.3 : 0.6);
   cursor = end;
 
   // Sound design
@@ -80,8 +83,11 @@ const segments = segs.map((s, i) => {
   if (type === "title" || type === "cta" || type === "punch") {
     if (i > 0 && type !== "punch") events.push({ t: Math.max(0, start - 0.9), kind: "riser", gain: 0.8 });
     events.push({ t: start + 0.03, kind: "impact", gain: type === "punch" ? 1 : type === "title" ? 1 : 0.8 });
+    if (ADHD && type === "punch") events.push({ t: start + 0.03, kind: "boom", gain: 0.9 });
     if (ENERGY) hits.push(start + 0.03);
   } else events.push({ t: Math.max(0, start - 0.12), kind: "whoosh", gain: ENERGY ? 0.7 : 0.55 });
+  if (ADHD) beats.forEach((b, k) => { if (k > 0) events.push({ t: b.start - 0.05, kind: "swoosh", gain: 0.4 }); });
+  if (s.scene.sticker) events.push({ t: (beats[s.scene.stickerBeat || 0]?.start ?? start) + 0.1, kind: "pop", gain: 1 });
   if (type === "notify") beats.forEach((b, k) => { if (k >= (s.scene.headingBeat ? 1 : 0)) events.push({ t: b.start, kind: "ding", gain: 0.9 }); });
   const perBeat = { bullets: "pop", flow: "pop", stats: "pop", checklist: "tick" }[type];
   if (perBeat) beats.forEach((b, k) => { if (k > 0 || type === "checklist") events.push({ t: b.start, kind: perBeat, gain: 0.8 }); });
@@ -93,7 +99,8 @@ const segments = segs.map((s, i) => {
 const duration = cursor;
 
 // Captions: split each beat into short chunks, time words by character position
-const MAXW = format === "portrait" ? 5 : 8;
+const MAXW = ADHD ? (format === "portrait" ? 2 : 3) : format === "portrait" ? 5 : 8;
+const HOT = new Set("paid money free robux you your game games millions never epic first sale live earn earns forever today broken ruined lava hacker exploiter why how build built ship shipped players".split(" "));
 const captions = [];
 for (const seg of segments) for (const b of seg.beats) {
   const words = b.text.split(/\s+/).filter(Boolean);
@@ -114,20 +121,36 @@ for (const seg of segments) for (const b of seg.beats) {
     const cs = b.start + (pos / total) * dur;
     const ce = b.start + ((pos + text.length) / total) * dur;
     let wpos = 0;
-    const ws = c.map((w) => { const wt = cs + (wpos / text.length) * (ce - cs); wpos += w.length + 1; return { w, t: wt }; });
+    const ws = c.map((w) => { const wt = cs + (wpos / text.length) * (ce - cs); wpos += w.length + 1; const bare = w.toLowerCase().replace(/[^a-z0-9$]/g, ""); return { w, t: wt, hot: HOT.has(bare) || /\d|\$|!$/.test(w) }; });
     captions.push({ start: cs, end: ce, text, words: ws });
     pos += text.length + 1;
   }
 }
 
 // ---------------------------------------------------------------- 3. audio mix
-const mixSpec = { duration, fps: FPS, clips, events, music: { style: ep.music || "calm", gain_db: ep.musicDb ?? -20 }, out: join(work, "mix.wav"), envelope_out: join(work, "mouth.json") };
+const mixSpec = { duration, fps: FPS, clips, events, music: { style: ep.music || "calm", gain_db: ep.musicDb ?? -20 }, out: join(work, "mix.wav"), envelope_out: join(work, "mouth.json"), out_nomusic: ENERGY ? join(work, "mix-nomusic.wav") : undefined };
 writeFileSync(join(work, "timeline.json"), JSON.stringify(mixSpec));
 log(`audio mix (${duration.toFixed(1)} s)`);
 run(PYTHON, [join(HERE, "tts", "mix.py"), join(work, "timeline.json")]);
 const mouth = JSON.parse(readFileSync(join(work, "mouth.json"), "utf8"));
 
-const EPISODE = { format, badge: ep.badge || "", energy: ENERGY, hits, segments, captions, mouth, fps: FPS, duration };
+// AI b-roll: scenes with { broll: "slug" } use videos/ai/<slug>.mp4 (from npm run hf:generate) if it exists.
+// Frames are extracted as JPEGs (headless Chromium can't decode H.264), cropped to fill the frame.
+for (const seg of segments) {
+  const slug = seg.scene.broll;
+  if (!slug) continue;
+  const src = join(HERE, "ai", `${slug}.mp4`);
+  if (!existsSync(src)) { log(`b-roll "${slug}" not found in videos/ai/, skipping`); continue; }
+  const dir = join(work, "broll", slug);
+  if (!existsSync(join(dir, "0001.jpg"))) {
+    mkdirSync(dir, { recursive: true });
+    run(FFMPEG, ["-y", "-loglevel", "error", "-i", src, "-vf", `fps=${FPS},scale=${W}:${H}:force_original_aspect_ratio=increase,crop=${W}:${H}`, "-q:v", "4", join(dir, "%04d.jpg")]);
+  }
+  const frames = readdirSync(dir).filter((f) => f.endsWith(".jpg")).length;
+  seg.scene._broll = { dir: pathToFileURL(dir).href, frames };
+}
+
+const EPISODE = { format, badge: ep.badge || "", energy: ENERGY, adhd: ADHD, music: MUSIC_META[ep.music || "calm"], hits, segments, captions, mouth, fps: FPS, duration };
 writeFileSync(join(work, "episode.json"), JSON.stringify(EPISODE));
 
 // ---------------------------------------------------------------- 4. render
@@ -191,5 +214,11 @@ await browser.close();
 writeFileSync(join(work, "parts.txt"), parts.map((f) => `file '${f}'`).join("\n"));
 run(FFMPEG, ["-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", join(work, "parts.txt"), "-i", join(work, "mix.wav"),
   "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", out]);
+if (ENERGY) {
+  // Second copy with voice + SFX only: add licensed trending audio inside Instagram/TikTok
+  const dry = out.replace(/\.mp4$/, "-nomusic.mp4");
+  run(FFMPEG, ["-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", join(work, "parts.txt"), "-i", join(work, "mix-nomusic.wav"),
+    "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", dry]);
+}
 parts.forEach((f) => rmSync(f, { force: true }));
 log(`done → ${out} (${duration.toFixed(1)} s, ${((Date.now() - t0) / 1000).toFixed(0)} s render)`);

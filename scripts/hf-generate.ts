@@ -1,4 +1,6 @@
 // Generates AI b-roll clips for the Instagram ads with Higgsfield Seedance 2.5 (text-to-video, 9:16).
+// The ad scripts in videos/episodes/ads reference these slugs via `broll: "slug"`; after generating,
+// re-render the ads with `npm run build:ads` and the clips appear behind the animated text.
 //
 //   npm run hf:plan               show what would be generated (free, no API calls)
 //   npm run hf:generate           actually generate (billable) → videos/ai/*.mp4
@@ -19,14 +21,14 @@ const OUT = join("videos", "ai");
 const STYLE = "stylized blocky low-poly 3D game look, vibrant colors, cinematic lighting, smooth camera motion";
 
 const CLIPS: { slug: string; use: string; prompt: string }[] = [
-  { slug: "lava-run", use: "Day 1 / Day 4 hook", prompt: `A blocky game character sprints across floating stone platforms above a glowing orange lava lake, grabbing spinning gold coins, sunset sky, camera follows from behind, ${STYLE}` },
-  { slug: "logo-build", use: "Intro sting", prompt: "A glowing lime-green pixel logo assembles from hundreds of tiny cubes on a pure black background, sparks and particles, slow push-in, clean 3D render" },
-  { slug: "dev-desk", use: "Day 1 / Day 6 'you could build this'", prompt: "A young game developer at a desk at night, monitor showing a 3D game editor, lime and pink RGB lighting, over-the-shoulder shot, shallow depth of field, cinematic" },
-  { slug: "heist-lasers", use: "Heist Pack teaser", prompt: `Blocky characters sneak past a red laser grid inside a bank vault full of gold, neon lighting, dramatic slow push-in, ${STYLE}` },
-  { slug: "tycoon-factory", use: "Tycoon Pack teaser", prompt: `A colorful blocky tycoon factory with conveyor belts carrying glowing ore, droppers and upgrade buttons, isometric camera slowly orbiting, ${STYLE}` },
-  { slug: "horror-hall", use: "Horror Pack teaser", prompt: `A dark blocky hallway lit only by a flashlight beam, thick fog, a tall blocky monster silhouette at the far end, slow creeping camera, ${STYLE}` },
-  { slug: "tower-defense", use: "Tower Defense Pack teaser", prompt: `Blocky towers fire colorful projectiles at a wave of blocky enemies marching along a winding path, top-down cinematic sweep, ${STYLE}` },
-  { slug: "coin-burst", use: "Day 5 / CTA ending", prompt: "An explosion of shiny gold coins and lime confetti in slow motion against a dark background, celebratory, glossy 3D render" },
+  { slug: "lava-run", use: "Day 1 + Day 4 hooks", prompt: `A blocky game character sprints across floating stone platforms above a glowing orange lava lake, grabbing spinning gold coins, sunset sky, camera follows from behind, ${STYLE}` },
+  { slug: "logo-build", use: "Day 1 CTA, Day 7 hook", prompt: "A glowing lime-green pixel logo assembles from hundreds of tiny cubes on a pure black background, sparks and particles, slow push-in, clean 3D render" },
+  { slug: "dev-desk", use: "Day 1 'why not you', Day 6 hook", prompt: "A young game developer at a desk at night, monitor showing a 3D game editor, lime and pink RGB lighting, over-the-shoulder shot, shallow depth of field, cinematic" },
+  { slug: "heist-lasers", use: "Day 6 'pay once'", prompt: `Blocky characters sneak past a red laser grid inside a bank vault full of gold, neon lighting, dramatic slow push-in, ${STYLE}` },
+  { slug: "tycoon-factory", use: "Day 5 'but how?'", prompt: `A colorful blocky tycoon factory with conveyor belts carrying glowing ore, droppers and upgrade buttons, isometric camera slowly orbiting, ${STYLE}` },
+  { slug: "horror-hall", use: "Day 3 'then this happens'", prompt: `A dark blocky hallway lit only by a flashlight beam, thick fog, a tall blocky monster silhouette at the far end, slow creeping camera, ${STYLE}` },
+  { slug: "tower-defense", use: "Day 3 hook", prompt: `Blocky towers fire colorful projectiles at a wave of blocky enemies marching along a winding path, top-down cinematic sweep, ${STYLE}` },
+  { slug: "coin-burst", use: "Day 1 'got paid', Day 5 hook", prompt: "An explosion of shiny gold coins and lime confetti in slow motion against a dark background, celebratory, glossy 3D render" },
 ];
 
 const args = process.argv.slice(2);

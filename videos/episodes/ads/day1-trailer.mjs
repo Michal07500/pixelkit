@@ -4,13 +4,13 @@ export default {
   id: "ig-day1-trailer",
   format: "portrait",
   badge: "NEW · ROBLOX COURSE",
-  music: "hype",
-  musicDb: -17,
-  energy: true,
-  speed: 1.12,
+  style: "adhd",
+  music: "phonk",
+  musicDb: -23,
+  speed: 1.18,
   segments: [
     {
-      scene: { type: "statement", text: "You've played *1,000 hours* of Roblox." },
+      scene: { broll: "lava-run", sticker: "🎮", type: "statement", text: "You've played *1,000 hours* of Roblox." },
       say: "You've played a thousand hours of Roblox.",
     },
     {
@@ -18,19 +18,19 @@ export default {
       say: "Every single one of those games? Someone built it.",
     },
     {
-      scene: { type: "punch", text: "And got *paid.*" },
+      scene: { broll: "coin-burst", sticker: "💸", type: "punch", text: "And got *paid.*" },
       say: "And got paid!",
     },
     {
-      scene: { type: "statement", eyebrow: "DEVELOPER EXCHANGE", text: "Roblox pays creators *hundreds of millions* every year.", sub: "Eligible creators cash out Robux for real money." },
+      scene: { sticker: "🤯", type: "statement", eyebrow: "DEVELOPER EXCHANGE", text: "Roblox pays creators *hundreds of millions* every year.", sub: "Eligible creators cash out Robux for real money." },
       say: "Roblox pays its creators hundreds of millions of dollars, every single year.",
     },
     {
-      scene: { type: "punch", text: "Why not *you?*" },
+      scene: { broll: "dev-desk", sticker: "👀", type: "punch", text: "Why not *you?*" },
       say: "So why not you?",
     },
     {
-      scene: {
+      scene: { sticker: "🔥", stickerBeat: 2,
         type: "notify",
         items: [
           { icon: "LIVE", title: "Your game is live!", sub: "Coin Rush is public", color: "#c6ff3d" },
@@ -52,7 +52,7 @@ export default {
       say: ["PIXEL KIT takes you from zero to shipped.", "Build the world.", "Write real code.", "Save progress.", "Add a store that earns!"],
     },
     {
-      scene: { type: "cta", title: "Start *free* today.", sub: "First lesson free · no experience needed", button: "LINK IN BIO" },
+      scene: { broll: "logo-build", sticker: "🚀", type: "cta", title: "Start *free* today.", sub: "First lesson free · no experience needed", button: "LINK IN BIO" },
       say: "Your first lesson is free. Link in bio. Let's build!",
     },
   ],

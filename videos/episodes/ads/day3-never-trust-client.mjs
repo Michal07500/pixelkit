@@ -3,17 +3,17 @@ export default {
   id: "ig-day3-never-trust-client",
   format: "portrait",
   badge: "ROBLOX DEV TIP #2",
-  music: "hype",
-  musicDb: -17,
-  energy: true,
-  speed: 1.12,
+  style: "adhd",
+  music: "phonk",
+  musicDb: -23,
+  speed: 1.18,
   segments: [
     {
-      scene: { type: "statement", text: "Your game *finally* takes off.", sub: "Hundreds of players. Your first sales." },
+      scene: { broll: "tower-defense", sticker: "🚀", type: "statement", text: "Your game *finally* takes off.", sub: "Hundreds of players. Your first sales." },
       say: ["Picture this. Your game finally takes off.", "Hundreds of players. Your first sales."],
     },
     {
-      scene: { type: "punch", text: "Then *this* happens.", sub: "One exploiter. 999,999 coins. Economy ruined." },
+      scene: { broll: "horror-hall", sticker: "💀", type: "punch", text: "Then *this* happens.", sub: "One exploiter. 999,999 coins. Economy ruined." },
       say: ["Then this happens.", "One exploiter gives himself nine hundred ninety nine thousand coins, and your whole economy is ruined overnight."],
     },
     {
@@ -21,7 +21,7 @@ export default {
       say: "The cause? One line that trusts the number the player sends.",
     },
     {
-      scene: { type: "punch", text: "Never trust the *client.*" },
+      scene: { sticker: "🛡️", type: "punch", text: "Never trust the *client.*" },
       say: "The golden rule: never trust the client!",
     },
     {
@@ -29,7 +29,7 @@ export default {
       say: "The player asks. The server checks the real price and the balance, and decides. Exploit closed.",
     },
     {
-      scene: { type: "cta", title: "Build games that *can't be broken.*", sub: "PIXEL KIT · Module 05", button: "LINK IN BIO" },
+      scene: { sticker: "🔒", type: "cta", title: "Build games that *can't be broken.*", sub: "PIXEL KIT · Module 05", button: "LINK IN BIO" },
       say: "Protect the game you worked so hard on. Link in bio.",
     },
   ],

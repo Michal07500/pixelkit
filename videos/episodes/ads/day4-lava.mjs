@@ -3,13 +3,13 @@ export default {
   id: "ig-day4-lava",
   format: "portrait",
   badge: "30-SECOND TUTORIAL",
-  music: "hype",
-  musicDb: -17,
-  energy: true,
-  speed: 1.12,
+  style: "adhd",
+  music: "phonk",
+  musicDb: -23,
+  speed: 1.18,
   segments: [
     {
-      scene: { type: "punch", text: "*Lava.* 8 lines.", sub: "Save this for later." },
+      scene: { broll: "lava-run", sticker: "🌋", type: "punch", text: "*Lava.* 8 lines.", sub: "Save this for later." },
       say: ["Lava in Roblox. Eight lines of code.", "Save this for later!"],
     },
     {
@@ -25,11 +25,11 @@ export default {
       ],
     },
     {
-      scene: { type: "bullets", headingBeat: true, heading: "Make it *epic*", items: ["Neon orange material", "Bloom in Lighting", "Bubbling particles", "A sizzle sound"] },
+      scene: { sticker: "✨", type: "bullets", headingBeat: true, heading: "Make it *epic*", items: ["Neon orange material", "Bloom in Lighting", "Bubbling particles", "A sizzle sound"] },
       say: ["Now make it epic.", "Neon orange.", "Bloom in lighting.", "Bubbling particles.", "And a sizzle sound!"],
     },
     {
-      scene: { type: "punch", text: "That's how *obbies* start.", sub: "Some of the biggest games on Roblox are built on hazards like this." },
+      scene: { broll: "lava-run", sticker: "🔥", type: "punch", text: "That's how *obbies* start.", sub: "Some of the biggest games on Roblox are built on hazards like this." },
       say: ["That's how obbies start.", "Some of the biggest games on Roblox are built on hazards exactly like this."],
     },
     {

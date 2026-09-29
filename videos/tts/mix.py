@@ -76,6 +76,8 @@ PROGRESSIONS = {
 
 
 def music_bed(duration, style):
+    if style == "phonk":
+        return phonk_bed(duration)
     hype = style == "hype"
     bpm = 124 if hype else 86
     beat = 60 / bpm
@@ -189,6 +191,110 @@ def music_bed(duration, style):
     return L + D, R + D
 
 
+PHONK_BPM = 130
+
+
+def phonk_bed(duration):
+    """Drift-phonk style beat: TR-808 cowbell riff, distorted gliding 808, kick, clap, hat rolls."""
+    beat = 60 / PHONK_BPM
+    bar = 4 * beat
+    s16 = beat / 4
+    n = int(duration * SR) + SR
+    L, R = np.zeros(n), np.zeros(n)
+    intro = bar                                  # one bar of cowbell only, then the drop
+
+    def put(buf, t0, wave, gain):
+        s0 = int(t0 * SR)
+        if s0 >= n or s0 < 0:
+            return
+        ln = min(len(wave), n - s0)
+        buf[s0:s0 + ln] += wave[:ln] * gain
+
+    def cowbell(semi, length=0.32):
+        ln = int(length * SR)
+        t = np.arange(ln) / SR
+        r = 2 ** (semi / 12)
+        sq = np.sign(np.sin(2 * np.pi * 540 * r * t)) + np.sign(np.sin(2 * np.pi * 800 * r * t))
+        band = smooth(sq, 2600) - smooth(sq, 500)
+        env = np.exp(-t * 11) * 0.8 + np.exp(-t * 60) * 0.4
+        return band * env
+
+    def eight_o_eight(freq_from, freq_to, length):
+        ln = int(length * SR)
+        t = np.arange(ln) / SR
+        glide = freq_to + (freq_from - freq_to) * np.exp(-t * 18)
+        x = np.sin(2 * np.pi * np.cumsum(glide) / SR) * np.exp(-t * 1.6)
+        x *= np.minimum(1, t / 0.004)
+        return np.tanh(x * 3.2) * 0.8
+
+    def kick():
+        ln = int(0.25 * SR)
+        t = np.arange(ln) / SR
+        return np.sin(2 * np.pi * np.cumsum(48 + 110 * np.exp(-t * 35)) / SR) * np.exp(-t * 14)
+
+    def clap():
+        ln = int(0.35 * SR)
+        t = np.arange(ln) / SR
+        noise = rng.standard_normal(ln)
+        band = smooth(noise, 3200) - smooth(noise, 900)
+        env = np.zeros(ln)
+        for off in (0, 0.011, 0.022):
+            m = t >= off
+            env[m] += np.exp(-(t[m] - off) * (70 if off < 0.02 else 16))
+        return band * env * 2.2
+
+    def hat(open_=False):
+        ln = int((0.12 if open_ else 0.03) * SR)
+        t = np.arange(ln) / SR
+        return np.diff(rng.standard_normal(ln + 1)) * np.exp(-t * (30 if open_ else 140))
+
+    # Cowbell riff (16 sixteenths per bar), two-bar phrase in E minor
+    riff = [
+        [0, None, 0, None, 3, None, 0, None, 7, None, 5, None, 3, None, 0, None],
+        [0, None, 0, None, 3, None, 5, None, 7, None, 10, None, 7, None, 5, 3],
+    ]
+    bass = [(0, 0), (1.5, 0), (2.5, 3), (3.25, -2)]     # (beat, semitone) per bar
+    E1 = 41.2
+    bars = int(np.ceil(duration / bar)) + 1
+    for b in range(bars):
+        t_bar = b * bar
+        drop = t_bar >= intro
+        for k, semi in enumerate(riff[b % 2]):
+            if semi is None:
+                continue
+            w = cowbell(semi)
+            put(L, t_bar + k * s16, w, 0.16)
+            put(R, t_bar + k * s16, w, 0.12)
+            put(R, t_bar + k * s16 + beat / 2, w, 0.06)   # ping-pong echo
+            put(L, t_bar + k * s16 + beat, w, 0.03)
+        if not drop:
+            continue
+        for beat_pos, semi in bass:
+            f = E1 * 2 ** (semi / 12)
+            w = eight_o_eight(f * 2, f, beat * 1.6)
+            put(L, t_bar + beat_pos * beat, w, 0.42)
+            put(R, t_bar + beat_pos * beat, w, 0.42)
+            kk = kick()
+            put(L, t_bar + beat_pos * beat, kk, 0.35)
+            put(R, t_bar + beat_pos * beat, kk, 0.35)
+        for beat_pos in (1, 3):
+            c = clap()
+            put(L, t_bar + beat_pos * beat, c, 0.13)
+            put(R, t_bar + beat_pos * beat, c, 0.13)
+        roll = b % 2 == 1
+        for k in range(16):
+            if roll and k >= 12:
+                for j in range(2):                       # 32nd-note roll at the end of the phrase
+                    put(L, t_bar + (k + j / 2) * s16, hat(), 0.03)
+                    put(R, t_bar + (k + j / 2) * s16, hat(), 0.035)
+            elif k % 2 == 0:
+                put(L, t_bar + k * s16, hat(open_=(k % 8 == 4)), 0.035)
+                put(R, t_bar + k * s16, hat(open_=(k % 8 == 4)), 0.04)
+
+    m = int(duration * SR)
+    return L[:m], R[:m]
+
+
 # ---------------------------------------------------------------- sound effects
 
 def sfx(kind):
@@ -205,6 +311,21 @@ def sfx(kind):
             y[i] = acc
         env = np.sin(np.pi * t / t[-1]) ** 1.5
         return y * env * 0.5
+    if kind == "boom":
+        ln = int(1.3 * SR)
+        t = np.arange(ln) / SR
+        x = np.sin(2 * np.pi * np.cumsum(38 + 70 * np.exp(-t * 6)) / SR) * np.exp(-t * 2.4)
+        return np.tanh(x * 2.5) * 0.75
+    if kind == "swoosh":
+        ln = int(0.22 * SR)
+        noise = rng.standard_normal(ln)
+        t = np.arange(ln) / SR
+        band = smooth(noise, 5000) - smooth(noise, 900)
+        return band * np.sin(np.pi * t / t[-1]) ** 2 * 0.9
+    if kind == "click":
+        ln = int(0.05 * SR)
+        t = np.arange(ln) / SR
+        return (np.sin(2 * np.pi * 2400 * t) * np.exp(-t * 120) + np.diff(rng.standard_normal(ln + 1)) * np.exp(-t * 200) * 0.3) * 0.25
     if kind == "ding":
         ln = int(0.5 * SR)
         t = np.arange(ln) / SR
@@ -291,6 +412,13 @@ def main():
     stereo = np.tanh(stereo * 1.1) / np.tanh(1.1)
     stereo *= 0.95 / (np.max(np.abs(stereo)) or 1)
     sf.write(spec["out"], stereo.astype(np.float32), SR, subtype="PCM_16")
+
+    # Voice + SFX only, for adding licensed trending audio inside Instagram/TikTok
+    if spec.get("out_nomusic"):
+        dry = np.stack([voice * 0.95 + fx * 0.8] * 2, axis=1)
+        dry = np.tanh(dry * 1.1) / np.tanh(1.1)
+        dry *= 0.95 / (np.max(np.abs(dry)) or 1)
+        sf.write(spec["out_nomusic"], dry.astype(np.float32), SR, subtype="PCM_16")
 
     # Per-frame mouth envelope
     frames = int(np.ceil(duration * fps))

@@ -11,7 +11,8 @@
     "release": "node scripts/release.mjs",
     "build:carousels": "node scripts/build-carousels.mjs",
     "hf:plan": "tsx scripts/hf-generate.ts",
-    "hf:generate": "tsx scripts/hf-generate.ts --yes"
+    "hf:generate": "tsx scripts/hf-generate.ts --yes",
+    "build:ads": "node videos/build-all.mjs ads"
   },
   "repository": {
     "type": "git",

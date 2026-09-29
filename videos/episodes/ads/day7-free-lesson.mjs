@@ -3,17 +3,17 @@ export default {
   id: "ig-day7-free-lesson",
   format: "portrait",
   badge: "FREE LESSON",
-  music: "hype",
-  musicDb: -17,
-  energy: true,
-  speed: 1.12,
+  style: "adhd",
+  music: "phonk",
+  musicDb: -23,
+  speed: 1.18,
   segments: [
     {
-      scene: { type: "statement", text: "Every big game opens with a *logo intro.*" },
+      scene: { broll: "logo-build", sticker: "🎬", type: "statement", text: "Every big game opens with a *logo intro.*" },
       say: "Every big game opens with a logo intro.",
     },
     {
-      scene: { type: "punch", text: "Yours can too. *10 min.*" },
+      scene: { sticker: "⏱️", type: "punch", text: "Yours can too. *10 min.*" },
       say: "Yours can too. In ten minutes!",
     },
     {
@@ -25,7 +25,7 @@ export default {
       say: ["The free lesson covers", "uploading your logo,", "the full script, explained,", "three UI skills you'll use forever,", "and testing on mobile."],
     },
     {
-      scene: { type: "cta", title: "Get it *free.*", sub: "PDF + narrated video", button: "LINK IN BIO" },
+      scene: { sticker: "🎁", type: "cta", title: "Get it *free.*", sub: "PDF + narrated video", button: "LINK IN BIO" },
       say: "It's free. Grab it now. Link in bio!",
     },
   ],
