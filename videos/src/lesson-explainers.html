@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- 1920x1080 animated explainers for the free lesson (Scale vs Offset, AnchorPoint, TweenService). -->
+<meta name="video" content='{"width":1920,"height":1080,"fps":30,"duration":42}'>
+<link href="fonts/fonts.css" rel="stylesheet">
+<style>
+  :root { --bg:#07070a; --card:#121218; --line:#23232e; --line2:#30303d; --text:#f5f5f7; --muted:#9b9bad; --accent:#c6ff3d; --deep:#6f9a00; --pink:#ff4fa3; --cyan:#3de0ff; --yellow:#ffd23d; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); color: var(--text); font-family: "Space Grotesk", sans-serif; }
+  #bg { position: absolute; inset: -60px; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 60px 60px; opacity: .4; }
+  #bar { position: absolute; bottom: 0; left: 0; height: 6px; background: var(--accent); }
+  .scene { position: absolute; inset: 0; opacity: 0; }
+  .head { position: absolute; left: 120px; top: 84px; }
+  .eyebrow { font-family: Silkscreen, monospace; color: var(--accent); font-size: 24px; letter-spacing: .06em; margin-bottom: 12px; }
+  .title { font-size: 64px; font-weight: 700; letter-spacing: -0.03em; }
+  .abs { position: absolute; }
+  .screen { position: absolute; border: 3px solid var(--line2); background: rgba(18,18,24,.85); }
+  .screen::before { content: attr(data-label); position: absolute; top: -40px; left: 0; font-family: "JetBrains Mono", monospace; font-size: 20px; color: var(--muted); }
+  .box { position: absolute; width: 150px; height: 150px; }
+  .chip { position: absolute; font-family: "JetBrains Mono", monospace; font-size: 26px; padding: 14px 22px; border: 2px solid currentColor; background: var(--bg); white-space: nowrap; }
+  .caption { position: absolute; left: 0; right: 0; text-align: center; font-size: 40px; font-weight: 500; }
+  .caption b { color: var(--accent); font-weight: 700; }
+  .k { color: var(--pink); } .n { color: var(--yellow); } .f { color: var(--cyan); }
+  .logo8 { width: 100%; height: 100%; }
+  .center-title { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .center-title h1 { font-size: 120px; letter-spacing: -0.04em; line-height: 1; }
+  .word { display: inline-block; }
+</style>
+</head>
+<body>
+<div id="bg"></div>
+
+<!-- Title -->
+<div class="scene" id="t0">
+  <div class="center-title">
+    <div class="eyebrow" id="t0e" style="font-size:32px;margin-bottom:28px">PIXEL KIT · LESSON 4.1</div>
+    <h1 id="t0h"><span class="word">3</span> <span class="word">things</span> <span class="word">to</span> <span class="word" style="color:var(--accent)">remember.</span></h1>
+  </div>
+</div>
+
+<!-- 01 Scale vs Offset -->
+<div class="scene" id="c1">
+  <div class="head"><div class="eyebrow">01 / 03</div><div class="title">Scale vs. Offset</div></div>
+  <div class="screen" id="c1screen" data-label="screen"></div>
+  <div class="box" id="c1a" style="background:var(--accent)"></div>
+  <div class="box" id="c1b" style="border:5px dashed var(--pink)"></div>
+  <div class="abs" id="c1x" style="font-family:Silkscreen,monospace;color:var(--pink);font-size:24px">OFF-SCREEN</div>
+  <div class="chip" id="c1ca" style="color:var(--accent);left:260px;top:930px">Scale&nbsp; UDim2.new(<span class="n">0.5</span>, 0, <span class="n">0.5</span>, 0)</div>
+  <div class="chip" id="c1cb" style="color:var(--pink);left:1010px;top:930px">Offset UDim2.new(0, <span class="n">550</span>, 0, <span class="n">280</span>)</div>
+  <div class="caption" id="c1cap" style="top:885px"><b>Scale</b> = % of the screen. It works on every device.</div>
+</div>
+
+<!-- 02 AnchorPoint -->
+<div class="scene" id="c2">
+  <div class="head"><div class="eyebrow">02 / 03</div><div class="title">AnchorPoint</div></div>
+  <div class="screen" id="c2screen" data-label="Position = UDim2.new(0.5, 0, 0.5, 0)" style="left:460px;top:250px;width:1000px;height:560px"></div>
+  <div class="abs" style="left:960px;top:250px;width:0;height:560px;border-left:2px dashed var(--line2)"></div>
+  <div class="abs" style="left:460px;top:530px;width:1000px;height:0;border-top:2px dashed var(--line2)"></div>
+  <div class="box" id="c2box" style="width:240px;height:240px;background:#000;border:3px solid var(--line2);padding:40px">
+    <svg class="logo8" viewBox="0 0 8 8" shape-rendering="crispEdges"><path fill="#c6ff3d" d="M1 1h4v1H1zM1 2h1v5H1zM4 2h1v2H4zM2 3h2v1H2zM6 1h1v6H6z"/></svg>
+  </div>
+  <div class="abs" id="c2dot" style="width:26px;height:26px;background:var(--cyan);left:947px;top:517px;box-shadow:0 0 0 6px rgba(61,224,255,.25)"></div>
+  <div class="chip" id="c2code" style="color:var(--text);left:560px;top:880px">logo.AnchorPoint = Vector2.<span class="f">new</span>(<span class="n" id="c2ax">0.00</span>, <span class="n" id="c2ay">0.00</span>)</div>
+  <div class="caption" id="c2cap" style="top:960px">Place the logo by its <b>center</b>, not its top-left corner.</div>
+</div>
+
+<!-- 03 TweenService -->
+<div class="scene" id="c3">
+  <div class="head"><div class="eyebrow">03 / 03</div><div class="title">TweenService</div></div>
+  <svg class="abs" id="graph" style="left:160px;top:250px" width="760" height="540" viewBox="0 0 760 540">
+    <rect x="1" y="1" width="758" height="538" fill="#121218" stroke="#30303d" stroke-width="2"/>
+    <line x1="80" y1="460" x2="720" y2="460" stroke="#9b9bad" stroke-width="2"/>
+    <line x1="80" y1="60" x2="80" y2="460" stroke="#9b9bad" stroke-width="2"/>
+    <line x1="80" y1="140" x2="720" y2="140" stroke="#30303d" stroke-width="2" stroke-dasharray="8 8"/>
+    <text x="700" y="500" fill="#9b9bad" font-family="JetBrains Mono" font-size="20" text-anchor="end">time →</text>
+    <text x="70" y="146" fill="#9b9bad" font-family="JetBrains Mono" font-size="18" text-anchor="end">shown</text>
+    <text x="70" y="466" fill="#9b9bad" font-family="JetBrains Mono" font-size="18" text-anchor="end">hidden</text>
+    <polyline id="curve" fill="none" stroke="#c6ff3d" stroke-width="6" stroke-linejoin="round"/>
+    <rect id="runner" width="20" height="20" fill="#c6ff3d"/>
+  </svg>
+  <div class="abs" id="c3name" style="left:1090px;top:260px;font-family:Silkscreen,monospace;font-size:34px;color:var(--accent)">LINEAR</div>
+  <div class="abs" style="left:1090px;top:330px;width:460px;height:460px;background:#000;border:3px solid var(--line2);display:grid;place-items:center">
+    <div id="c3logo" style="width:260px;height:260px"><svg class="logo8" viewBox="0 0 8 8" shape-rendering="crispEdges"><path fill="#fff" d="M1 1h4v1H1zM1 2h1v5H1zM4 2h1v2H4zM2 3h2v1H2zM6 1h1v6H6z"/></svg></div>
+  </div>
+  <div class="chip" id="c3code" style="color:var(--text);left:160px;top:830px">TweenInfo.<span class="f">new</span>(<span class="n">0.25</span>, Enum.EasingStyle.<span class="k" id="c3style">Linear</span>)</div>
+  <div class="caption" id="c3cap" style="top:960px">Tell it <b>what</b> to change, <b>to what value</b>, and <b>how long</b>.</div>
+</div>
+
+<!-- End card -->
+<div class="scene" id="end">
+  <div class="center-title">
+    <svg id="endlogo" width="160" height="160" viewBox="0 0 8 8" shape-rendering="crispEdges"><rect width="8" height="8" fill="#000"/><path fill="#c6ff3d" d="M1 1h4v1H1zM1 2h1v5H1zM4 2h1v2H4zM2 3h2v1H2zM6 1h1v6H6z"/></svg>
+    <h1 id="endh" style="margin-top:50px">Get the full course.</h1>
+    <div id="ends" style="font-family:Silkscreen,monospace;color:var(--accent);font-size:34px;margin-top:36px">LINK IN THE DESCRIPTION</div>
+  </div>
+</div>
+
+<div id="bar"></div>
+
+<script>
+  const DUR = 42;
+  const $ = id => document.getElementById(id);
+  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const p = (t, s, d) => clamp((t - s) / d);
+  const out3 = x => 1 - Math.pow(1 - x, 3);
+  const inOut = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  const back = x => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+  const lerp = (a, b, k) => a + (b - a) * k;
+
+  function scene(el, t, a, b, fade = .35) {
+    const o = Math.min(p(t, a, fade), 1 - p(t, b - fade, fade));
+    el.style.opacity = o;
+    return o;
+  }
+  function rise(el, k, dist = 40) { el.style.opacity = k; el.style.transform = `translateY(${(1 - k) * dist}px)`; }
+
+  const EASINGS = [
+    { name: "Linear", f: x => x, s: 28.3 },
+    { name: "Quad", f: x => 1 - (1 - x) * (1 - x), s: 30.9 },
+    { name: "Back", f: back, s: 33.5 },
+  ];
+
+  window.renderFrame = function (t) {
+    $("bar").style.width = (t / DUR * 100) + "%";
+    $("bg").style.transform = `translate(${(t * 10) % 60}px, ${(t * 6) % 60}px)`;
+
+    // Title
+    scene($("t0"), t, 0, 3.2);
+    rise($("t0e"), out3(p(t, .2, .5)));
+    [...$("t0h").children].forEach((w, i) => {
+      const k = back(p(t, .5 + i * .15, .45));
+      w.style.opacity = clamp(k); w.style.transform = `translateY(${(1 - k) * 70}px)`;
+    });
+
+    // 01 Scale vs Offset: the screen shrinks to a phone and back
+    scene($("c1"), t, 3.2, 15.5);
+    const toPhone = inOut(p(t, 7, 1.4)) - inOut(p(t, 11.6, 1.4));
+    const W = lerp(1100, 360, toPhone), H = lerp(540, 640, toPhone);
+    const cx = 960, cy = 545, left = cx - W / 2, top = cy - H / 2;
+    Object.assign($("c1screen").style, { left: left + "px", top: top + "px", width: W + "px", height: H + "px" });
+    $("c1screen").dataset.label = toPhone > .5 ? "phone" : "desktop";
+    const ka = back(p(t, 3.8, .5)), kb = back(p(t, 4.4, .5));
+    Object.assign($("c1a").style, { left: (left + W * .5 - 75) + "px", top: (top + H * .5 - 75) + "px", transform: `scale(${ka})` });
+    Object.assign($("c1b").style, { left: (left + 550 - 75) + "px", top: (top + 280 - 75) + "px", transform: `scale(${kb})` });
+    const off = p(t, 8.2, .3) * (1 - p(t, 11.6, .3));
+    Object.assign($("c1x").style, { left: (left + 550 - 75) + "px", top: (top + 280 + 90) + "px", opacity: off });
+    rise($("c1ca"), out3(p(t, 4.2, .5)));
+    rise($("c1cb"), out3(p(t, 4.8, .5)));
+    const cap1 = out3(p(t, 9, .5));
+    $("c1ca").style.transform += ` translateY(${cap1 * 60}px)`;
+    $("c1cb").style.transform += ` translateY(${cap1 * 60}px)`;
+    rise($("c1cap"), cap1);
+
+    // 02 AnchorPoint: anchor slides from (0,0) to (0.5,0.5)
+    scene($("c2"), t, 15.5, 27.8);
+    const a = .5 * inOut(p(t, 19.5, 1.8));
+    const kb2 = back(p(t, 16, .5));
+    Object.assign($("c2box").style, { left: (960 - a * 240) + "px", top: (530 - a * 240) + "px", transform: `scale(${kb2})`, transformOrigin: `${a * 100}% ${a * 100}%` });
+    $("c2dot").style.transform = `scale(${back(p(t, 16.8, .4))})`;
+    $("c2ax").textContent = $("c2ay").textContent = a.toFixed(2);
+    rise($("c2code"), out3(p(t, 17.4, .5)));
+    $("c2code").style.borderColor = a > 0 && a < .5 ? "var(--cyan)" : "";
+    rise($("c2cap"), out3(p(t, 22, .5)));
+
+    // 03 TweenService: draw three easing curves and apply them to the logo
+    scene($("c3"), t, 27.8, 39.5);
+    let run = EASINGS[0];
+    for (const e of EASINGS) if (t >= e.s - .3) run = e;
+    const k = p(t, run.s, 1.8);
+    const pts = [];
+    const N = Math.round(k * 80);
+    const X = x => 80 + x * 640, Y = v => 460 - v * 320;
+    for (let i = 0; i <= N; i++) { const x = i / 80; pts.push(`${X(x)},${Y(run.f(x))}`); }
+    $("curve").setAttribute("points", pts.join(" "));
+    const v = run.f(k);
+    $("runner").setAttribute("x", X(k) - 10); $("runner").setAttribute("y", Y(v) - 10);
+    $("c3logo").style.opacity = clamp(v);
+    $("c3logo").style.transform = `scale(${.9 + .1 * v})`;
+    $("c3name").textContent = run.name.toUpperCase();
+    $("c3style").textContent = run.name;
+    rise($("c3code"), out3(p(t, 28.4, .5)));
+    rise($("c3cap"), out3(p(t, 36.3, .5)));
+
+    // End card
+    scene($("end"), t, 39.5, DUR + 1, .3);
+    $("endlogo").style.transform = `scale(${back(p(t, 39.6, .5))})`;
+    rise($("endh"), out3(p(t, 39.9, .5)));
+    rise($("ends"), out3(p(t, 40.3, .5)));
+  };
+
+  window.renderFrame(0);
+
+  // Open with ?play to preview the animation live in a browser (the renderer loads it without ?play).
+  if (new URLSearchParams(location.search).has("play")) {
+    const start = performance.now();
+    const loop = () => { window.renderFrame(((performance.now() - start) / 1000) % DUR); requestAnimationFrame(loop); };
+    loop();
+  }
+</script>
+</body>
+</html>

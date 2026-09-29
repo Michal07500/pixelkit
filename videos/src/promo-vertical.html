@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- 1080x1920 vertical promo (TikTok / Reels / Shorts). Rendered frame by frame via window.renderFrame(t). -->
+<meta name="video" content='{"width":1080,"height":1920,"fps":30,"duration":19}'>
+<link href="fonts/fonts.css" rel="stylesheet">
+<style>
+  :root { --bg:#07070a; --card:#121218; --line:#23232e; --text:#f5f5f7; --muted:#9b9bad; --accent:#c6ff3d; --deep:#6f9a00; --pink:#ff4fa3; --cyan:#3de0ff; --yellow:#ffd23d; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); color: var(--text); font-family: "Space Grotesk", sans-serif; }
+  #bg { position: absolute; inset: -80px; background-image: linear-gradient(var(--line) 2px, transparent 2px), linear-gradient(90deg, var(--line) 2px, transparent 2px); background-size: 80px 80px; opacity: .45; }
+  #glow { position: absolute; width: 1400px; height: 1400px; left: -160px; top: 260px; background: radial-gradient(circle, rgba(198,255,61,.16), transparent 62%); }
+  #bar { position: absolute; top: 0; left: 0; height: 10px; background: var(--accent); }
+  .scene { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 90px; opacity: 0; }
+  .pixel { font-family: Silkscreen, monospace; }
+  .eyebrow { font-family: Silkscreen, monospace; color: var(--accent); font-size: 38px; letter-spacing: .06em; margin-bottom: 40px; }
+  h1 { font-size: 150px; line-height: .95; letter-spacing: -0.04em; font-weight: 700; text-align: center; }
+  h2 { font-size: 104px; line-height: 1; letter-spacing: -0.03em; font-weight: 700; text-align: center; margin-bottom: 70px; }
+  .hl { color: var(--accent); }
+  .word { display: inline-block; }
+
+  /* S1 logo */
+  #logo { position: relative; width: 560px; height: 560px; }
+  #logo i { position: absolute; width: 70px; height: 70px; background: var(--accent); }
+  #logoText { font-family: Silkscreen, monospace; font-size: 110px; font-weight: 700; margin-top: 70px; letter-spacing: .02em; }
+
+  /* S3 code */
+  .win { width: 920px; background: #0e0e13; border: 3px solid #30303d; box-shadow: 18px 18px 0 var(--line); font-family: "JetBrains Mono", monospace; }
+  .win-bar { display: flex; gap: 14px; align-items: center; padding: 22px 26px; border-bottom: 3px solid #30303d; color: var(--muted); font-size: 26px; }
+  .win-bar i { width: 20px; height: 20px; display: block; }
+  pre { padding: 36px 32px; font-size: 34px; line-height: 1.6; color: #d6d6e0; min-height: 520px; white-space: pre; font-family: inherit; }
+  .k { color: var(--pink); } .s { color: var(--accent); } .c { color: #62627a; } .f { color: var(--cyan); } .n { color: var(--yellow); }
+  .cursor { display: inline-block; width: 18px; height: 40px; background: var(--accent); vertical-align: -8px; }
+  .out { border-top: 3px solid #30303d; padding: 22px 32px; font-size: 28px; color: var(--accent); display: flex; justify-content: space-between; }
+
+  /* S4 list */
+  .list { width: 900px; display: grid; gap: 26px; }
+  .row { display: flex; align-items: center; gap: 34px; padding: 30px 36px; background: var(--card); border: 3px solid var(--line); font-size: 50px; font-weight: 500; }
+  .box { width: 52px; height: 52px; border: 4px solid var(--muted); flex: none; position: relative; }
+  .box b { position: absolute; inset: 8px; background: var(--accent); }
+  .num { font-family: Silkscreen, monospace; color: var(--accent); font-size: 36px; width: 60px; }
+
+  /* S5 tiles */
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; width: 900px; }
+  .tile { background: var(--card); border: 4px solid var(--c); padding: 40px 34px; height: 250px; display: flex; flex-direction: column; justify-content: space-between; }
+  .tile i { width: 56px; height: 56px; background: var(--c); display: block; box-shadow: inset 0 0 0 14px #000; }
+  .tile span { font-size: 50px; font-weight: 700; }
+
+  /* S6 CTA */
+  .cta { margin-top: 90px; font-family: Silkscreen, monospace; font-size: 46px; background: var(--accent); color: #0b0f00; padding: 36px 54px; box-shadow: 12px 12px 0 var(--deep); }
+  .brand { display: flex; align-items: center; gap: 26px; font-family: Silkscreen, monospace; font-size: 64px; font-weight: 700; margin-bottom: 110px; }
+</style>
+</head>
+<body>
+<div id="bg"></div>
+<div id="glow"></div>
+
+<div class="scene" id="s1">
+  <div id="logo"></div>
+  <div id="logoText">PIXEL KIT</div>
+</div>
+
+<div class="scene" id="s2">
+  <h1 id="l1"><span class="word">You</span> <span class="word">play</span><br><span class="word">Roblox.</span></h1>
+  <h1 id="l2" style="margin-top:90px"><span class="word">What</span> <span class="word">if</span> <span class="word">you</span><br><span class="word hl">built</span> <span class="word hl">it?</span></h1>
+</div>
+
+<div class="scene" id="s3">
+  <div class="eyebrow">WRITE REAL CODE</div>
+  <div class="win">
+    <div class="win-bar"><i style="background:var(--pink)"></i><i style="background:var(--yellow)"></i><i style="background:var(--accent)"></i><span style="margin-left:10px">IntroSplash.lua</span></div>
+    <pre id="code"></pre>
+    <div class="out" id="out"><span>▶ Running</span><span style="color:var(--muted)">0 errors</span></div>
+  </div>
+</div>
+
+<div class="scene" id="s4">
+  <h2>Build a <span class="hl">full game.</span></h2>
+  <div class="list" id="list"></div>
+</div>
+
+<div class="scene" id="s5">
+  <h2>Then pick<br>your <span class="hl">genre.</span></h2>
+  <div class="tiles" id="tiles"></div>
+</div>
+
+<div class="scene" id="s6">
+  <div class="brand"><svg width="84" height="84" viewBox="0 0 8 8" shape-rendering="crispEdges"><rect width="8" height="8" fill="#000"/><path fill="#c6ff3d" d="M1 1h4v1H1zM1 2h1v5H1zM4 2h1v2H4zM2 3h2v1H2zM6 1h1v6H6z"/></svg>PIXEL KIT</div>
+  <h1 id="c1">Learn Roblox<br>Studio.</h1>
+  <h1 id="c2" class="hl" style="margin-top:30px">Ship real<br>games.</h1>
+  <div class="cta" id="cta">FREE LESSON → LINK IN BIO</div>
+</div>
+
+<div id="bar"></div>
+
+<script>
+  const DUR = 19;
+  const $ = id => document.getElementById(id);
+  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const p = (t, s, d) => clamp((t - s) / d);
+  const out3 = x => 1 - Math.pow(1 - x, 3);
+  const inOut = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  const back = x => { const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+
+  // Scene visibility with fade in/out
+  function scene(el, t, a, b, fade = .3) {
+    const o = Math.min(p(t, a, fade), 1 - p(t, b - fade, fade));
+    el.style.opacity = o;
+    return o;
+  }
+
+  // Logo pixels (8x8 grid, same mark as the site)
+  const PIX = [];
+  const add = (x, y, w, h) => { for (let i = 0; i < w; i++) for (let j = 0; j < h; j++) PIX.push([x + i, y + j]); };
+  add(1, 1, 4, 1); add(1, 2, 1, 5); add(4, 2, 1, 2); add(2, 3, 2, 1); add(6, 1, 1, 6);
+  PIX.sort((a, b) => (a[0] + a[1]) - (b[0] + b[1]));
+  $("logo").innerHTML = PIX.map(([x, y]) => `<i style="left:${x * 70}px;top:${y * 70}px"></i>`).join("");
+  const logoPx = [...$("logo").children];
+
+  // Code with syntax tokens, typed out over time
+  const TOKENS = [
+    ["c", "-- your first intro screen\n"],
+    ["k", "local "], ["", "tween = TweenService:"], ["f", "Create"], ["", "(\n"],
+    ["", "  logo, TweenInfo."], ["f", "new"], ["", "("], ["n", "0.25"], ["", "),\n"],
+    ["", "  { ImageTransparency = "], ["n", "0"], ["", " }\n)\n\n"],
+    ["", "tween:"], ["f", "Play"], ["", "()\n"],
+    ["", "task."], ["f", "wait"], ["", "("], ["n", "2"], ["", ")\n"],
+    ["", "screenGui:"], ["f", "Destroy"], ["", "()"],
+  ];
+  const TOTAL = TOKENS.reduce((n, [, s]) => n + s.length, 0);
+  const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  function codeUpTo(n) {
+    let html = "", left = n;
+    for (const [cls, s] of TOKENS) {
+      if (left <= 0) break;
+      const part = esc(s.slice(0, left));
+      html += cls ? `<span class="${cls}">${part}</span>` : part;
+      left -= s.length;
+    }
+    return html;
+  }
+
+  const ITEMS = ["World building", "Luau scripting", "UI & menus", "Saving player data", "In-game store", "Publish & grow"];
+  $("list").innerHTML = ITEMS.map((x, i) => `<div class="row"><span class="num">0${i + 1}</span><span class="box"><b></b></span>${x}</div>`).join("");
+  const rows = [...$("list").children];
+
+  const GENRES = [["Obby", "#c6ff3d"], ["Tycoon", "#ffd23d"], ["Simulator", "#3de0ff"], ["Horror", "#ff4fa3"], ["Heist", "#c6ff3d"], ["Tower Defense", "#ffd23d"]];
+  $("tiles").innerHTML = GENRES.map(([n, c]) => `<div class="tile" style="--c:${c}"><i></i><span>${n}</span></div>`).join("");
+  const tiles = [...$("tiles").children];
+
+  window.renderFrame = function (t) {
+    $("bar").style.width = (t / DUR * 100) + "%";
+    $("bg").style.transform = `translate(${(t * 18) % 80}px, ${(t * 30) % 80}px)`;
+    $("glow").style.transform = `translate(${Math.sin(t * .6) * 80}px, ${Math.cos(t * .5) * 120}px)`;
+
+    // S1: logo assembles pixel by pixel
+    const o1 = scene($("s1"), t, 0, 2.3, .2);
+    logoPx.forEach((el, i) => {
+      const k = back(p(t, .15 + i * .035, .35));
+      el.style.transform = `scale(${k})`;
+      el.style.opacity = clamp(k * 3);
+    });
+    const lt = out3(p(t, 1.05, .45));
+    $("logoText").style.opacity = lt;
+    $("logoText").style.transform = `translateY(${(1 - lt) * 60}px)`;
+    $("s1").style.transform = `scale(${1 + p(t, 2.0, .3) * .15})`;
+
+    // S2: hook text
+    scene($("s2"), t, 2.3, 5.2, .15);
+    [...$("l1").children].forEach((w, i) => {
+      const k = out3(p(t, 2.4 + i * .14, .3));
+      w.style.opacity = k; w.style.transform = `translateY(${(1 - k) * 80}px)`;
+    });
+    $("l1").style.opacity = 1 - p(t, 3.5, .3) * .65;
+    [...$("l2").children].forEach((w, i) => {
+      const k = back(p(t, 3.6 + i * .12, .35));
+      w.style.opacity = clamp(k); w.style.transform = `translateY(${(1 - k) * 90}px) scale(${.8 + .2 * k})`;
+    });
+
+    // S3: code typing
+    scene($("s3"), t, 5.2, 9.4);
+    const n = Math.floor(TOTAL * inOut(p(t, 5.5, 2.7)));
+    const blink = (Math.floor(t * 3) % 2 === 0 || n < TOTAL) ? "" : "opacity:0";
+    $("code").innerHTML = codeUpTo(n) + `<span class="cursor" style="${blink}"></span>`;
+    const ok = p(t, 8.3, .2);
+    $("out").style.opacity = .25 + ok * .75;
+    $("out").style.background = `rgba(198,255,61,${(1 - p(t, 8.5, .6)) * ok * .18})`;
+
+    // S4: checklist
+    scene($("s4"), t, 9.4, 12.6);
+    rows.forEach((r, i) => {
+      const k = out3(p(t, 9.6 + i * .22, .35));
+      r.style.opacity = k; r.style.transform = `translateX(${(1 - k) * -140}px)`;
+      const c = back(p(t, 9.9 + i * .22, .3));
+      const b = r.querySelector("b");
+      b.style.transform = `scale(${c})`;
+      r.querySelector(".box").style.borderColor = c > .5 ? "var(--accent)" : "var(--muted)";
+    });
+
+    // S5: genre tiles
+    scene($("s5"), t, 12.6, 15.6);
+    tiles.forEach((el, i) => {
+      const k = back(p(t, 12.9 + i * .13, .4));
+      el.style.opacity = clamp(k); el.style.transform = `scale(${.6 + .4 * k}) rotate(${(1 - k) * (i % 2 ? 6 : -6)}deg)`;
+    });
+
+    // S6: call to action
+    scene($("s6"), t, 15.6, DUR + 1);
+    const c1 = out3(p(t, 15.8, .4)), c2 = back(p(t, 16.2, .45)), cta = back(p(t, 16.8, .4));
+    $("c1").style.opacity = c1; $("c1").style.transform = `translateY(${(1 - c1) * 60}px)`;
+    $("c2").style.opacity = clamp(c2); $("c2").style.transform = `scale(${.85 + .15 * c2})`;
+    const pulse = 1 + Math.max(0, Math.sin((t - 17.4) * 5)) * .04 * (t > 17.4 ? 1 : 0);
+    $("cta").style.opacity = clamp(cta); $("cta").style.transform = `scale(${(.7 + .3 * cta) * pulse})`;
+  };
+
+  window.renderFrame(0);
+
+  // Open with ?play to preview the animation live in a browser (the renderer loads it without ?play).
+  if (new URLSearchParams(location.search).has("play")) {
+    const start = performance.now();
+    const loop = () => { window.renderFrame(((performance.now() - start) / 1000) % DUR); requestAnimationFrame(loop); };
+    loop();
+  }
+</script>
+</body>
+</html>

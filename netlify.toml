@@ -1,0 +1,3 @@
+# Netlify deploys only the public website, not the plan or video sources.
+[build]
+  publish = "site"
