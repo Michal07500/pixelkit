@@ -1,0 +1,2 @@
+Fonts in this folder (Inter, JetBrains Mono, Silkscreen, Space Grotesk) are from Google Fonts
+and licensed under the SIL Open Font License 1.1: https://openfontlicense.org

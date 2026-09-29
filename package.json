@@ -4,7 +4,8 @@
   "description": "PIXEL KIT: Roblox Studio course, site, videos and Higgsfield generation",
   "scripts": {
     "seedance": "tsx index.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:pdf": "node scripts/build-pdfs.mjs"
   },
   "repository": {
     "type": "git",
@@ -21,6 +22,9 @@
   },
   "devDependencies": {
     "@types/node": "^26.6.3",
+    "highlight.js": "^11.12.0",
+    "marked": "^18.0.14",
+    "playwright": "^1.56.1",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
   },
