@@ -1,0 +1,29 @@
+{
+  "name": "pixelkit",
+  "version": "1.0.0",
+  "description": "PIXEL KIT: Roblox Studio course, site, videos and Higgsfield generation",
+  "scripts": {
+    "seedance": "tsx index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Michal07500/pixelkit.git"
+  },
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/Michal07500/pixelkit/issues"
+  },
+  "homepage": "https://github.com/Michal07500/pixelkit#readme",
+  "dependencies": {
+    "@higgsfield/client": "^0.2.6",
+    "dotenv": "^18.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  },
+  "private": true,
+  "type": "module"
+}

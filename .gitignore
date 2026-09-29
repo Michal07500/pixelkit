@@ -1,3 +1,7 @@
 node_modules/
 .DS_Store
 *.log
+# Local secrets: never commit
+.env
+.env.local
+.env.*.local
