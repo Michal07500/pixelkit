@@ -12,11 +12,15 @@ A project-based Roblox Studio course (ages 17–25) with genre-specific add-on p
 |---|---|
 | [`site/`](site/) | Landing page with Lemon Squeezy checkout, `thanks.html`, `privacy.html`, free lesson (`free/`) and trailer (`media/`). No build step. |
 | [`course/modules/`](course/modules/) | The full course: 9 modules, 43 lessons, Luau code and exercises (Markdown). |
-| [`course/pdf/`](course/pdf/) | Designed PDFs: one per module, the free lesson, and the complete course. |
-| [`videos/out/`](videos/out/) | Rendered MP4s: 10 narrated course videos, 7 Instagram Reels, a 16:9 trailer. |
+| [`course/packs/`](course/packs/) | Genre Packs sold separately: Horror (Night Shift) and Tycoon (Pizza Tycoon), 5 lessons each. |
+| [`course/pdf/`](course/pdf/) | Designed PDFs: one per module, the free lesson, the complete course, 4 bonuses and the Genre Packs. |
+| [`videos/out/`](videos/out/) | Rendered MP4s: 10 course videos, 10 Genre Pack videos, 14 Reels for two weeks, a 16:9 trailer. |
 | [`videos/episodes/`](videos/episodes/) | The script of every video: narration + scenes. |
 | [`videos/engine/`](videos/engine/) | The animation engine (scenes, captions, mascot). |
-| [`social/`](social/) | Instagram launch week: schedule, captions, hashtags, carousels. |
+| [`social/`](social/) | Instagram week 1, week 2 + TikTok/Shorts: schedule, captions, hashtags, carousels. |
+| [`netlify/functions/`](netlify/functions/) | Email automation: `/api/subscribe` (MailerLite, free lesson by email) and `/api/lemon-webhook` (buyers → Customers group). |
+| [`email/`](email/) | The 7 automated emails, ready to paste into MailerLite. |
+| [`docs/`](docs/) | The Slovak launch guide as a PDF. |
 | [`assets/`](assets/) | Brand images and fonts (OFL). |
 | [`index.ts`](index.ts), [`scripts/hf-generate.ts`](scripts/hf-generate.ts) | Higgsfield SDK: Seedance 2.5 test and AI b-roll generation. |
 | [`PLAN.md`](PLAN.md) | Business plan: pricing, validation, marketing, numbers, legal. |
