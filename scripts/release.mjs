@@ -4,7 +4,7 @@
 //
 // 1. site/free/   ← free lesson PDF + narrated video (downloaded after email signup)
 // 2. site/media/  ← the hero reel (9:16) + poster frame for the landing page
-// 3. dist/PIXEL-KIT-Core-Course.zip ← what buyers download (upload it as the product file)
+// 3. dist/PIXEL-KIT-Core-Course-Part-1.zip + Part-2.zip ← what buyers download (upload both as product files)
 // 4. dist/PIXEL-KIT-<Name>-Pack.zip  ← one ZIP per Genre Pack (PDF + narrated videos)
 //
 // Env: FFMPEG (default ffmpeg) for the poster frame.
@@ -44,15 +44,18 @@ const poster = spawnSync(FFMPEG, ["-y", "-loglevel", "error", "-ss", "6.4", "-i"
 if (poster.status === 0) console.log("site/media/reel-poster.jpg");
 else console.warn("Could not extract the poster frame (is ffmpeg installed?). The video still works without it.");
 
-// 3. The paid course download
-const zip = new AdmZip();
+// 3. The paid course download, in two parts so each file stays under 100 MB
+//    (GitHub's file limit, and quick to upload to Lemon Squeezy).
 const pdfs = readdirSync(p("course/pdf")).filter((f) => f.endsWith(".pdf") && !f.startsWith("pack-")).sort();
-for (const f of pdfs) zip.addLocalFile(p("course/pdf", f), "PDF");
 const videos = readdirSync(p("videos/out")).filter((f) => /^course-m\d\d-.*\.mp4$/.test(f)).sort();
 if (videos.length < 10) console.warn(`Only ${videos.length}/10 course videos found in videos/out.`);
-for (const f of videos) zip.addLocalFile(p("videos/out", f), "Videos", f.replace(/^course-/, ""));
-zip.addFile("START HERE.txt", Buffer.from(
+const startHere = Buffer.from(
 `PIXEL KIT: Learn Roblox Studio. Ship real games.
+
+Your course comes in two downloads:
+  Part 1: all PDFs + videos for modules 00-03
+  Part 2: videos for modules 04-09
+Unzip both into the same folder.
 
 How to use this course
 1. Open Videos/m01-getting-started.mp4 and watch it.
@@ -65,11 +68,21 @@ PDF/bonus-*.pdf are your bonuses: Luau Cheat Sheet, Game Launch Checklist, 30 Ga
 
 Questions or problems? Reply to your receipt email.
 PIXEL KIT is not affiliated with Roblox Corporation.
-`));
+`);
 mkdirSync(p("dist"), { recursive: true });
-const out = p("dist/PIXEL-KIT-Core-Course.zip");
-zip.writeZip(out);
-console.log(`dist/PIXEL-KIT-Core-Course.zip  (${mb(out)}, ${pdfs.length} PDFs, ${videos.length} videos)`);
+const parts = [
+  { file: "PIXEL-KIT-Core-Course-Part-1.zip", pdfs: true, videos: videos.filter((f) => /^course-m0[0-3]-/.test(f)) },
+  { file: "PIXEL-KIT-Core-Course-Part-2.zip", pdfs: false, videos: videos.filter((f) => !/^course-m0[0-3]-/.test(f)) },
+];
+for (const part of parts) {
+  const zip = new AdmZip();
+  if (part.pdfs) for (const f of pdfs) zip.addLocalFile(p("course/pdf", f), "PDF");
+  for (const f of part.videos) zip.addLocalFile(p("videos/out", f), "Videos", f.replace(/^course-/, ""));
+  zip.addFile("START HERE.txt", startHere);
+  const out = p("dist", part.file);
+  zip.writeZip(out);
+  console.log(`dist/${part.file}  (${mb(out)}, ${part.pdfs ? pdfs.length : 0} PDFs, ${part.videos.length} videos)`);
+}
 
 // 4. Genre Packs
 const PACKS = {

@@ -21,7 +21,7 @@ Kupujúci dostanú len prehľadné **PDF a MP4 videá v ZIP-e**, nič z GitHubu.
 | `email/SEQUENCE.md` | Texty všetkých 7 e-mailov, pripravené na skopírovanie do MailerLite |
 | `course/pdf/` | PDF: 9 modulov, lekcia zadarmo, celý kurz, 4 bonusy, **Horror Pack** a **Tycoon Pack** |
 | `videos/out/` | Všetky videá s komentátorom (kurz, 2 packy, reklamy na 2 týždne) |
-| `dist/` | Hotové ZIP-y na predaj (vzniknú po `npm run release`, pozri 3.1) |
+| `delivery/` | **Hotové ZIP-y na predaj**, pripravené na nahratie do Lemon Squeezy |
 | `social/` | Instagram + TikTok + YouTube Shorts: plán na 2 týždne, popisky, hashtagy, karusely |
 | `docs/PIXEL-KIT-Navod.pdf` | Tento návod ako PDF |
 
@@ -87,18 +87,16 @@ Odporúčam **Lemon Squeezy**: rieši platby kartou, PayPal aj Apple Pay, **sám
 
 **3.1 ZIP-y na predaj**
 
-Hotové ZIP-y som ti poslal priamo do chatu. Ak ich chceš vytvoriť znova (po úprave kurzu), na počítači spusti (pozri 7.1):
-```bash
-npm run build:pdf
-npm run release
-```
-V priečinku `dist/` vzniknú:
+Hotové ZIP-y sú na GitHube v priečinku **`delivery/`**. Otvor súbor a klikni na **Download raw file** (ikona ↓ vpravo hore). Každý má menej ako 100 MB.
 
 | Súbor | Obsah |
 |---|---|
-| `PIXEL-KIT-Core-Course.zip` | 15 PDF (moduly, lekcia zadarmo, celý kurz, 4 bonusy) + 10 videí + START HERE |
+| `PIXEL-KIT-Core-Course-Part-1.zip` | 15 PDF (moduly, lekcia zadarmo, celý kurz, 4 bonusy) + videá modulov 00–03 + START HERE |
+| `PIXEL-KIT-Core-Course-Part-2.zip` | videá modulov 04–09 + START HERE |
 | `PIXEL-KIT-Horror-Pack.zip` | Horror Pack PDF + 5 videí + START HERE |
 | `PIXEL-KIT-Tycoon-Pack.zip` | Tycoon Pack PDF + 5 videí + START HERE |
+
+Keď kurz neskôr upravíš, ZIP-y vytvoríš znova na počítači (pozri 7.1) príkazmi `npm run build:pdf` a `npm run release`. Vzniknú v priečinku `dist/`.
 
 **3.2 Obchod a produkty**
 1. Registrácia na **lemonsqueezy.com**, vytvor obchod (Store). Vyplň údaje na výplaty (Payouts) a over identitu.
@@ -106,9 +104,9 @@ V priečinku `dist/` vzniknú:
 
 | Produkt | Cena | Súbory (Files) | Kľúč v `CHECKOUT` |
 |---|---|---|---|
-| PIXEL KIT Core Course | $29 | Core-Course.zip | `course` |
-| PIXEL KIT Creator Bundle | $59 | Core-Course.zip + Horror-Pack.zip + Tycoon-Pack.zip | `bundle` |
-| PIXEL KIT All Access | $99 | všetky tri ZIP-y | `all` |
+| PIXEL KIT Core Course | $29 | Core-Course-Part-1.zip + Part-2.zip | `course` |
+| PIXEL KIT Creator Bundle | $59 | obe časti kurzu + Horror-Pack.zip + Tycoon-Pack.zip | `bundle` |
+| PIXEL KIT All Access | $99 | všetky štyri ZIP-y | `all` |
 | Horror Pack | $19 | Horror-Pack.zip | `horror` |
 | Tycoon Pack | $19 | Tycoon-Pack.zip | `tycoon` |
 
